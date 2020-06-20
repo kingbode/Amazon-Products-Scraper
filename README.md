@@ -48,7 +48,6 @@ rather than doing automation form main page to get the links then click on them,
 - I work now on fetching questions !!.............. Done
 
 ============================================================
-
 in in  Amazon_Asin_V1.6.py
 
 I will enhance the code and remove un-necessary lines
