@@ -17,7 +17,7 @@ I could read all the product reviews ( Positive and Critical ) ones, using selen
 
 I created Review Items
 
-I created Product Items
+I created Product Items 
 
 
 =============================
@@ -51,5 +51,10 @@ rather than doing automation form main page to get the links then click on them,
 in in  Amazon_Asin_V1.6.py
 
 I will enhance the code and remove un-necessary lines
+============================================================
+
+in in  Amazon_Asin_V1.7.py
+
+created class for Amzon Function to be called from Amazon_Asin_V1.7.py
 ============================================================
 
