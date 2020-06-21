@@ -55,6 +55,6 @@ take Amazon Product ASIN and retrieve , Product Profile , Reviews and Questions
 
   in in  Amazon_Asin_V1.7.py
 
-  created class for Amzon Function to be called from Amazon_Asin_V1.7.py
+  created class for Amzon Functions to be called from Main App
 ============================================================
 
