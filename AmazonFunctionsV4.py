@@ -513,7 +513,7 @@ def get_All_Product_Reviews(driver_,Amazon_Product_):
             pass
 
     # to get count of critical reviews !!
-    Amazon_Product_.Product_No_Of_Critical_Reviewes = str(len(Reviews_List) - int(Amazon_Product_.Product_No_Of_Postivie_Reviewes))
+    Amazon_Product_.Product_No_Of_Critical_Reviewes = str(abs(len(Reviews_List) - int(Amazon_Product_.Product_No_Of_Postivie_Reviewes)))
 
     print('- All Critical Reviews had been collected !')
 

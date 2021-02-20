@@ -19,7 +19,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 timeout = 5
 
-ASIN_ = 'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
+ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
 
 Amazon_URL_ = 'https://www.amazon.com'
 
@@ -142,6 +142,8 @@ if _ASIN_Validity:
 
 #===========================================================================
 # here we get how much time is taken to execute this process
+
+    driver_.close()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
