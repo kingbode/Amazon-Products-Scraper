@@ -1,0 +1,51 @@
+[
+    [
+        {
+            "Amazon Product Profile": {
+                "Product_ASIN": "B07KNHQ8NZ",
+                "Product_Title": "Learn GIS Programming with ArcGIS for Javascript API 4.x and ArcGIS Online: Learn GIS programming by building an engaging web map application works on mobile or the web\n\n\nKindle Edition",
+                "Product_URL": "https://www.amazon.com/dp/B07KNHQ8NZ",
+                "Product_All_Reviews_URL": "https://www.amazon.com/Learn-Programming-ArcGIS-Javascript-Online-ebook/product-reviews/B07KNHQ8NZ/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews",
+                "Product_Positive_Reviews_URL": "https://www.amazon.com/Learn-Programming-ArcGIS-Javascript-Online-ebook/product-reviews/B07KNHQ8NZ/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=positive&pageNumber=1",
+                "Product_Critical_Reviews_URL": "https://www.amazon.com/Learn-Programming-ArcGIS-Javascript-Online-ebook/product-reviews/B07KNHQ8NZ/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=critical&pageNumber=1",
+                "Product_No_Of_Postivie_Reviewes": "0",
+                "Product_No_Of_Critical_Reviewes": "0",
+                "Product_Questions_URL": "https://www.amazon.com/ask/questions/asin/B07KNHQ8NZ/"
+            }
+        },
+        {
+            "Amazon Product Reviews": [
+                {
+                    "Reviewer_Name": "Ronney Phillips",
+                    "Review_Title": "If you want to understand GIS programming, buy this book!",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "15-01-2019",
+                    "Review_Text": "I've been a big fan of the author's YouTube channel and podcasts for a while, so when I saw he'd written a new book about GIS programming and ArcGIS JavaScript API 4.9, I had to get the book.This book shows you how to create and host a custom web map on your own computer.  Nasser walks you through every bit of the instruction step by step, building each layer upon a solid foundation.  There's not a lot of useless mumbo jumbo, and his casual language makes it easy to read through.Because it's very, very easy to slip up and misplace a brace or a semicolon, he provides the step-by-step code periodically to check your work.  This was really useful to me -- I have a bit of Python and C++ experience, so I tend to make mistakes more readily than more experienced programmers.He also walks the reader through how to create a web map through ArcGIS Online.  I didn't need much help here because I've created lots of maps through AGOL, but it would be very valuable for those with little or no AGOL experience.The end result, of course, is what I'd written earlier, but it didn't really hit me until I'd finished that I'd created something fairly complicated that was also useful and relatable to others. I was pretty amazed, and I plan on working through the book again just to try catching things I didn't really note the first time.  Just like his YouTube channel, Nasser did an excellent job of explaining everything thoroughly in a easily-understood manner.The only thing I could say was a drawback: This book is self published -- as such, the language is a little looser than one might expect in a book like this.  Editing could have been better, but I don't think it was enough to detract from the overall lessons.I'm an intermediate GIS student, but I can say this book helped me just as much as some of the GIS classes I've taken.  It expanded on some of the basic lessons I learned -- but even without previous programming or much GIS experience, I believe readers will be able to go through the book and learn more about GIS and GIS programming.Highlight:  I can't say enough about the extra thought given to releasing the underlying code periodically.  It really, really helped me doublecheck my work when I'd left out a character or failed to delete an errant brace.  Nasser provides his email address for users who have questions, and although I had no questions throughout the book, I've seen him respond quickly to user questions -- I have no doubt he would respond to questions about the book just as quickly.  You don't really see support or customer care like that very often.Overall, just like Nasser's other learning avenues mentioned earlier, this was an excellent exercise to introduce and familiarize users with the concepts and code behind GIS programming and ArcGIS JS API 4.9.  Highly recommended, and I look forward to seeing more from the author.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Amazon Customer",
+                    "Review_Title": "A self-published text with low production values and typos",
+                    "Review_Rating": "★",
+                    "Review_Date": "23-11-2020",
+                    "Review_Text": "I had to buy this book as one of the textbooks for a class I took on web GIS and I was really disappointed by the low quality.  There are a number of typos, including the table of contents having incorrect page numbers.  (Chapter 4 starts on page 75, not on page 80, for example.)  The code samples are difficult to read---and impossible if you're color-blind---because they are dark grey text highlighted in black.  It appears that the entire book was created to be viewed on a screen and then printed out without any consideration for how it would look on paper.",
+                    "Review_type": "Critical",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "JustMe",
+                    "Review_Title": "Loose the code highlighting",
+                    "Review_Rating": "★★★",
+                    "Review_Date": "13-10-2019",
+                    "Review_Text": "I think this book would be great but as I am severely color blind I am not able to read substantial portions of the code samples because of the highlighting that has been applied throughout the book.  I had downloaded the kindle version in hopes the highlighting could be removed but there was not an option to do so.",
+                    "Review_type": "Critical",
+                    "Review_ASIN_": "B07MW4BR8D"
+                }
+            ]
+        },
+        {
+            "Amazon Product Questions": []
+        }
+    ]
+]
