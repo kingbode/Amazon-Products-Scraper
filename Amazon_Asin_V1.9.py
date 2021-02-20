@@ -1,18 +1,10 @@
-
-
-import time
-
-
-from AmazonFunctionsV3 import initialize_WebDriver, load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
-    get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON
+from AmazonFunctionsV4 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
+    get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver
 
 from Amazon_Product import Amazon_Product
 
 from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
-from selenium.webdriver.common.keys import Keys
 import time
-from random import randint
 
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -35,6 +27,8 @@ ASIN_baseURL_ = 'https://www.amazon.com/dp/'
 
 
 full_URL = ASIN_baseURL_ + ASIN_
+
+_ASIN_Validity = False
 
 Rating_ = '★★★★★'
 
@@ -67,22 +61,18 @@ start_time = time.time()
 #=============================================== Main Application =========================================
 #==========================================================================================================
 
+# 0- Checking ASIN Validity:
+
+_ASIN_Validity = _check_ASIN_Existance(full_URL)
+
+
+
 # 1- Initialize Web Driver:
-options = webdriver.ChromeOptions()
 
-options.add_experimental_option("excludeSwitches", ["ignore-certificate-errors"])
-options.add_experimental_option("useAutomationExtension", True)
-options.add_argument('--disable-gpu')
-# to hide the browser
-# options.add_argument('--headless')
+if _ASIN_Validity:
+    print('- Valid Product ASIN is being processed')
 
-# ChromeDriverManager helps you avoid below error
-
-""" 
-selenium.common.exceptions.SessionNotCreatedException: Message: session not created: This version of ChromeDriver only supports Chrome version 80
-
-"""
-driver_ = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    driver_ = initialize_WebDriver()
 
 # driver.get(URL_)
 # driver_ = initialize_WebDriver(Chrome_Driver_Path)
@@ -91,13 +81,15 @@ driver_ = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 # 2- Visiting main Link of a given ASIN
 #==========================================================================================================
 
-load_Procut_Page(full_URL,driver_)
+    load_Procut_Page(full_URL,driver_)
+
+
 
 #==========================================================================================================
 # 3- bypassing nagging popup window for local country
 #==========================================================================================================
 
-remove_Nagging_Window(driver_)
+    remove_Nagging_Window(driver_)
 
 #===========================================================================
 # Now use the Main Product Page to get all teh Fields of Amazon_Product Object
@@ -106,10 +98,10 @@ remove_Nagging_Window(driver_)
 # 4- Get Amazon Product Profile
 #===========================================================================
 
-Amazon_Product_ = get_Product_Profile(driver_,ASIN_)
+    Amazon_Product_ = get_Product_Profile(driver_,ASIN_)
 
 
-Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})
+    Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})
 #===========================================================================
 #Starting Scrapping
 #===========================================================================
@@ -118,20 +110,20 @@ Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})
 # 5- Loading the Page of All Reviews of the Product !!!
 #===========================================================================
 
-Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_)
+    Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_)
 
 #===========================================================================
 # Saving All Reviews details about the Product in Amazon_Product_Data !!!
 #===========================================================================
 
-Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
+    Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
 #===========================================================================
 
 #===========================================================================
 # 6- Loading the Page of All Questions about the Product !!!
 #===========================================================================
 
-Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_)
+    Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_)
 
 #==============================================================================
 
@@ -139,19 +131,23 @@ Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_)
 # Saving All Questions details about the Product in Amazon_Product_Data !!!
 #===========================================================================
 
-Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
+    Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
 
 #===========================================================================
 
 #===========================================================================
 # output the data as json file
 #===========================================================================
-_save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
+    _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
 
 #===========================================================================
 # here we get how much time is taken to execute this process
 
-print("--- %s seconds ---" % (time.time() - start_time))
+    print("--- %s seconds ---" % (time.time() - start_time))
 
-print('hi')
+
+else:
+    print('- Product ASIN seems to be invalid or no longer exists in Amazon database')
+
+    print('hi')
 

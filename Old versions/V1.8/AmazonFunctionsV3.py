@@ -54,7 +54,7 @@ Questions_List = []
 
 Amazon_Product_ = Amazon_Product()
 
-Chrome_Driver_Path = r'.\chromedriver.exe'
+Chrome_Driver_Path = r'../../chromedriver.exe'
 
 headers_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'}
 
@@ -84,8 +84,56 @@ def initialize_WebDriver(Chrome_Driver_Path):
 # Visiting main Link of a given ASIN
 # ==========================================================================================================
 
+def _check_ASIN_Existance(url_):
+
+    cookies = {
+        'aws_lang': 'en',
+        'c_m': 'undefinedwww.quora.comOther%20Natural%20Referrersundefined',
+        's_cc': 'true',
+        's_sq': '%5B%5BB%5D%5D',
+        's_eVar60': 'ft_card',
+        'skin': 'noskin',
+        'session-id': '136-6213593-5967538',
+        'session-id-time': '2082787201l',
+        'i18n-prefs': 'USD',
+        'sp-cdn': 'L5Z9:KW',
+        'csm-hit': 'tb:AN7EWR668Q5JCTXTVRP2+b-AN7EWR668Q5JCTXTVRP2|1613837223659&t:1613837223659&adb:adblk_yes',
+        'ubid-main': '135-5950261-3540542',
+        'session-token': 'tUsF3fpJYnyOruyDOPSt7iWG6eWkP19RRHdlOa0Rk4PqAgnzUke+TGw0ieU/RyI++mU3qx/Mo916iGoojSb/WQV7GQzwCKiCYSr+JOTmixG0yZhf6zsDJ7fwbqEDDkTmxoj70xOb9LeyCLSr69I04ogNT9vg7K6aBUFS3emUSRI6+i0e6BAp5z0jbwFA60A5',
+        'lc-main': 'en_US',
+    }
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+    }
+
+    response = requests.get(url_, headers=headers, cookies=cookies)
+
+    if response.status_code==200:
+        return True
+    elif response.status_code!=200:
+        return False
+
+
+
 def load_Procut_Page(url_,driver_):
-    driver_.get(url_)
+
+    if _check_ASIN_Existance(url_):
+        driver_.get(url_)
+        print('- Valid Product ASIN is being processed')
+        return True
+
+    else:
+        print('- Product ASIN seems to be invalid or no longer exists in Amazon database')
+        return False
+
+        #Sorry! We couldn't find that page. Try searching or go to Amazon's home page.
+
+
 
 #==========================================================================================================
 #bypassing nagging popup window for local country
