@@ -54,7 +54,7 @@ Questions_List = []
 
 Amazon_Product_ = Amazon_Product()
 
-Chrome_Driver_Path = r'../chromedriver.exe'
+Chrome_Driver_Path = r'../../chromedriver.exe'
 
 headers_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'}
 
