@@ -52,9 +52,14 @@ Amazon_Asin_V1.6.py
 I will enhance the code and remove un-necessary lines
 in in Amazon_Asin_V1.7.py
 
+=============================
+
+
 Amazon_Asin_V1.7.py
 =============================
 created class for Amzon Function to be called from Amazon_Asin_V1.7.py
+
+=============================
 
 
 Amazon_Asin_V1.8.py
@@ -63,3 +68,31 @@ Amazon_Asin_V1.8.py
 created class for Amzon FunctionV3 to be called from Amazon_Asin_V1.8.py
 
 updated finding elements as per Amazon updates
+
+=============================
+
+
+Amazon_Asin_V1.9.py
+=============================
+
+created class for Amzon FunctionV4 to be called from Amazon_Asin_V1.9.py
+
+Added Product Price in Amazon Product Class "Amazon_Product.py"
+
+Added command line to get ASIN number as an input form the command line
+
+Added ASIN availability checker
+
+=============================
+
+
+Amazon_Asin_V2.0.py
+=============================
+
+created class for Amzon FunctionV5 to be called from Amazon_Asin_V2.0.py
+
+will work on specifying number of customers' reviews (option)
+
+will work on specifying number of customers' questions (option)
+
+=============================

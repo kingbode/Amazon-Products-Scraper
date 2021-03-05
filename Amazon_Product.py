@@ -3,12 +3,13 @@
 class Amazon_Product(object):
 
 
-    def __init__(self, Product_ASIN=None, Product_Title=None, Product_URL=None, Product_All_Reviews_URL=None,
+    def __init__(self, Product_ASIN=None, Product_Title=None, Product_Price=None,Product_URL=None, Product_All_Reviews_URL=None,
                  Product_Positive_Reviews_URL=None, Product_Critical_Reviews_URL=None,
                  Product_No_Of_Postivie_Reviewes=None, Product_No_Of_Critical_Reviewes=None, Product_Questions_URL=None
                  ):
         self.Product_ASIN = Product_ASIN
         self.Product_Title = Product_Title
+        self.Product_Price = Product_Price
         self.Product_URL = Product_URL
 
         self.Product_All_Reviews_URL = Product_All_Reviews_URL

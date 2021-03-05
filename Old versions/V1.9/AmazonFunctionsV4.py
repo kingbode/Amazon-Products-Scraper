@@ -55,7 +55,7 @@ Questions_List = []
 
 Amazon_Product_ = Amazon_Product()
 
-Chrome_Driver_Path = r'.\chromedriver.exe'
+Chrome_Driver_Path = r'../../chromedriver.exe'
 
 headers_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'}
 
@@ -187,6 +187,7 @@ def get_Product_Profile(driver_,ASIN_):
         # ===========================================================================
         soup_Main = BeautifulSoup(amazon_page_ ,"html.parser")
         Product_Title = soup_Main.find('span' , {'id':'productTitle'}).text.rstrip().lstrip()
+        Product_Price = soup_Main.find('span' , {'id':'priceblock_ourprice'}).text.rstrip().lstrip()
         print('- got Product Title Successfully')
 
         # ===========================================================================
@@ -194,7 +195,8 @@ def get_Product_Profile(driver_,ASIN_):
         # ===========================================================================
         All_reviews_link = soup_Main.find('div', {'id': 'reviews-medley-footer'}).find('a')['href']
         All_reviews_link = Amazon_URL_ + All_reviews_link
-        print('- got All_reviews_link Successfully , from Main Page of the product using Soup')
+        # print('- got All_reviews_link Successfully , from Main Page of the product using Soup')
+        print('- got All_reviews_link Successfully , from Main Page of the product')
 
         # ===========================================================================
         # get All_Questions_link
@@ -203,7 +205,8 @@ def get_Product_Profile(driver_,ASIN_):
         # All_Questions_link = Amazon_URL_ + All_Questions_link
         All_Questions_link = 'https://www.amazon.com/ask/questions/asin/' + ASIN_ + '/'
 
-        print('- got All_Questions_link Successfully , from Main Page of the product using Soup')
+        # print('- got All_Questions_link Successfully , from Main Page of the product using Soup')
+        print('- got All_Questions_link Successfully , from Main Page of the product')
 
         # ===========================================================================
         # Passing collected Data about teh Product to Amazon_Product Object
@@ -211,6 +214,7 @@ def get_Product_Profile(driver_,ASIN_):
         Amazon_Product_.Product_ASIN = ASIN_
 
         Amazon_Product_.Product_Title = Product_Title
+        Amazon_Product_.Product_Price = Product_Price
         # Main Product URL
         Amazon_Product_.Product_URL = ASIN_baseURL_ + ASIN_
         # All Reviews URL

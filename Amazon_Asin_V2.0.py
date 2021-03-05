@@ -1,14 +1,9 @@
-from AmazonFunctionsV4 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
+from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver
 
 from Amazon_Product import Amazon_Product
 
-from selenium import webdriver
 import time
-
-from webdriver_manager.chrome import ChromeDriverManager
-
-
 
 # ASIN Search Website
 # https://amazon-asin.com/asincheck/?product_id=BO7GKK5FQT
@@ -19,7 +14,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 timeout = 5
 
-ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
+# ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
+
+ASIN_ = input('Please Input Amazon Product ASIN : ')
 
 Amazon_URL_ = 'https://www.amazon.com'
 
@@ -82,7 +79,6 @@ if _ASIN_Validity:
 #==========================================================================================================
 
     load_Procut_Page(full_URL,driver_)
-
 
 
 #==========================================================================================================
