@@ -101,7 +101,7 @@ Added Parameter to specify number of customers' Questions pages to collect (opti
 
 Added Parameter to hide the Browser or display it while fetching the data, example:  -v 1  (to display the Browser) , -v 0 (to hide the Browser)
 
-no need to put parameteres in order !!
+no need to put parameters in order !!
 
 Example: python Amazon_Asin_V2.0.py -q 2 -r 2 -a B07MW4BR8D -v 1
 in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D
@@ -112,14 +112,23 @@ usage: Amazon_Asin_V2.0.py [-h] -a ASIN [-r REVIEWSCOUNT] [-q QUESTIONSCOUNT] [-
 to get Amazon Product Data, Reviews and Question
 
 optional arguments:
+
   -h, --help            show this help message and exit
+
   -a ASIN, --ASIN ASIN  Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter
+
   -r REVIEWSCOUNT, --ReviewsCount REVIEWSCOUNT
-                        Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews
+
+	Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews
+
   -q QUESTIONSCOUNT, --QuestionsCount QUESTIONSCOUNT
-                        Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions
+
+	Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions
+
   -v HIDEBROWSER, --HideBrowser HIDEBROWSER
-                        to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile
+
+	to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile
+
 
 
 =============================

@@ -20,10 +20,10 @@ args = None
 
 parser = argparse.ArgumentParser(description='to get Amazon Product Data, Reviews and Question')
 #-q 10 -r 10 -a B07MW4BR8D -v 1
-parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter', default=None)
-parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews', default=None)
-parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
-parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
+parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required parameter', default=None)
+parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional parameter ,if not set, the tool will collect all Product Reviews', default=None)
+parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional parameter ,if not set, the tool will collect all Product Questions', default=None)
+parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional parameter ,if not set, the Browser will be invisibile', default=None)
 
 try:
     args = parser.parse_args()
@@ -37,7 +37,7 @@ except:
     print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1')
     print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')
     print('and the Browser will be invisible')
-    print('\nand no need to put parameteres in order !!')
+    print('\nand no need to put parameters in order !!')
     print('===================================================================')
     parser.print_help()
     parser.exit(1)
@@ -47,7 +47,7 @@ except:
 
 #===================================================================
 # ASIN Search Website
-# https://amazon-asin.com/asincheck/?product_id=BO7GKK5FQT
+# https://amazon-asin.com/asincheck/?product_id=B07MW4BR8D
 
 #===================================================================
 # Declaring variables
