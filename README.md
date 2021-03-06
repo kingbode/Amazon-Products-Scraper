@@ -89,10 +89,45 @@ Added ASIN availability checker
 Amazon_Asin_V2.0.py
 =============================
 
-created class for Amzon FunctionV5 to be called from Amazon_Asin_V2.0.py
+Created class for Amzon FunctionV5 to be called from Amazon_Asin_V2.0.py
 
-will work on specifying number of customers' reviews (option)
+Added comman line parameters as below:
 
-will work on specifying number of customers' questions (option)
+Added Parameter to Enter ASIN inthe command line, example -a B07MW4BR8D
+
+Added Parameter to specify number of customers' Reviews pages to collect (option), example:  -r 3
+
+Added Parameter to specify number of customers' Questions pages to collect (option), example:  -q 3
+
+Added Parameter to hide the Browser or display it while fetching the data, example:  -v 1  (to display the Browser) , -v 0 (to hide the Browser)
+
+no need to put parameteres in order !!
+
+Example: python Amazon_Asin_V2.0.py -q 2 -r 2 -a B07MW4BR8D -v 1
+in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D
+and the Brwoser will be invisible
+
+usage: Amazon_Asin_V2.0.py [-h] -a ASIN [-r REVIEWSCOUNT] [-q QUESTIONSCOUNT] [-v HIDEBROWSER]
+
+to get Amazon Product Data, Reviews and Question
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a ASIN, --ASIN ASIN  Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter
+  -r REVIEWSCOUNT, --ReviewsCount REVIEWSCOUNT
+                        Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews
+  -q QUESTIONSCOUNT, --QuestionsCount QUESTIONSCOUNT
+                        Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions
+  -v HIDEBROWSER, --HideBrowser HIDEBROWSER
+                        to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile
+
+
+=============================
+
+
+Amazon_Asin_V2.1.py
+=============================
+
+working on Adding option to output the data in csv formart
 
 =============================

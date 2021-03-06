@@ -1,10 +1,51 @@
 from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
-    get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver
+    get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
+    check_P_I
 
 from Amazon_Product import Amazon_Product
 
 import time
 
+import argparse
+
+import sys
+
+# print(sys.executable)
+# print(sys.path)
+#===================================================================
+# Handling Application Arguments !!
+#===================================================================
+
+args = None
+
+parser = argparse.ArgumentParser(description='to get Amazon Product Data, Reviews and Question')
+#-q 10 -r 10 -a B07MW4BR8D -v 1
+parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter', default=None)
+parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews', default=None)
+parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
+parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
+
+try:
+    args = parser.parse_args()
+
+    # print(args)
+    # parser.exit(1)
+
+except:
+    # here , it means no arguments were entered, so display the Help and exit !!
+    print('===================================================================')
+    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1')
+    print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')
+    print('and the Browser will be invisible')
+    print('\nand no need to put parameteres in order !!')
+    print('===================================================================')
+    parser.print_help()
+    parser.exit(1)
+
+
+
+
+#===================================================================
 # ASIN Search Website
 # https://amazon-asin.com/asincheck/?product_id=BO7GKK5FQT
 
@@ -14,9 +55,28 @@ import time
 
 timeout = 5
 
+#  Arguments example : -A B07MW4BR8D -R 10 -Q 10
+# -A B07MW4BR8D
 # ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
 
-ASIN_ = input('Please Input Amazon Product ASIN : ')
+# ASIN_ = input('Please Input Amazon Product ASIN : ')
+ASIN_ = args.ASIN
+
+if(check_P_I(args.ReviewsCount)):
+    Reviews_limit = args.ReviewsCount
+else:
+    Reviews_limit = None
+
+if(check_P_I(args.QuestionsCount)):
+    Question_limit = args.QuestionsCount
+else:
+    Question_limit = None
+
+if(check_P_I(args.HideBrowser)):
+    _to_HideBrowser = bool(args.HideBrowser)
+else:
+    _to_HideBrowser = True
+
 
 Amazon_URL_ = 'https://www.amazon.com'
 
@@ -38,8 +98,6 @@ Critical_Reviews_Count = 0
 Amazon_Product_Data = []
 
 Reviews_List = []
-
-Questions_List = []
 
 Questions_List = []
 
@@ -69,7 +127,7 @@ _ASIN_Validity = _check_ASIN_Existance(full_URL)
 if _ASIN_Validity:
     print('- Valid Product ASIN is being processed')
 
-    driver_ = initialize_WebDriver()
+    driver_ = initialize_WebDriver(_to_HideBrowser)
 
 # driver.get(URL_)
 # driver_ = initialize_WebDriver(Chrome_Driver_Path)
@@ -106,7 +164,7 @@ if _ASIN_Validity:
 # 5- Loading the Page of All Reviews of the Product !!!
 #===========================================================================
 
-    Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_)
+    Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
 
 #===========================================================================
 # Saving All Reviews details about the Product in Amazon_Product_Data !!!
@@ -119,7 +177,7 @@ if _ASIN_Validity:
 # 6- Loading the Page of All Questions about the Product !!!
 #===========================================================================
 
-    Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_)
+    Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
 
 #==============================================================================
 
