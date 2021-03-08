@@ -1,6 +1,6 @@
 from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
-    check_P_I
+    check_P_I, _save_Data_to_XLSX
 
 from Amazon_Product import Amazon_Product
 
@@ -20,10 +20,13 @@ args = None
 
 parser = argparse.ArgumentParser(description='to get Amazon Product Data, Reviews and Question')
 #-q 10 -r 10 -a B07MW4BR8D -v 1
-parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required parameter', default=None)
-parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional parameter ,if not set, the tool will collect all Product Reviews', default=None)
-parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional parameter ,if not set, the tool will collect all Product Questions', default=None)
-parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional parameter ,if not set, the Browser will be invisibile', default=None)
+parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter', default=None)
+parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews', default=None)
+parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
+parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
+parser.add_argument('-json', '--json',required=False, type=int,help='to output the data in JSON format', default=None)
+
+
 
 try:
     args = parser.parse_args()
@@ -47,7 +50,7 @@ except:
 
 #===================================================================
 # ASIN Search Website
-# https://amazon-asin.com/asincheck/?product_id=B07MW4BR8D
+# https://amazon-asin.com/asincheck/?product_id=BO7GKK5FQT
 
 #===================================================================
 # Declaring variables
@@ -72,10 +75,18 @@ if(check_P_I(args.QuestionsCount)):
 else:
     Question_limit = None
 
-if(check_P_I(args.HideBrowser)):
-    _to_HideBrowser = bool(args.HideBrowser)
+if(args.HideBrowser == None):
+    _to_HideBrowser=True
 else:
-    _to_HideBrowser = True
+    if(check_P_I(args.HideBrowser)):
+        _to_HideBrowser = bool(args.HideBrowser)
+    else:
+        _to_HideBrowser = True
+
+
+if(check_P_I(args.json)):
+    _to_JSON = bool(args.json)
+
 
 
 Amazon_URL_ = 'https://www.amazon.com'
@@ -129,73 +140,79 @@ if _ASIN_Validity:
 
     driver_ = initialize_WebDriver(_to_HideBrowser)
 
-# driver.get(URL_)
-# driver_ = initialize_WebDriver(Chrome_Driver_Path)
+    # driver.get(URL_)
+    # driver_ = initialize_WebDriver(Chrome_Driver_Path)
 
-#==========================================================================================================
-# 2- Visiting main Link of a given ASIN
-#==========================================================================================================
+    #==========================================================================================================
+    # 2- Visiting main Link of a given ASIN
+    #==========================================================================================================
 
     load_Procut_Page(full_URL,driver_)
 
-
-#==========================================================================================================
-# 3- bypassing nagging popup window for local country
-#==========================================================================================================
+    #==========================================================================================================
+    # 3- bypassing nagging popup window for local country
+    #==========================================================================================================
 
     remove_Nagging_Window(driver_)
 
-#===========================================================================
-# Now use the Main Product Page to get all teh Fields of Amazon_Product Object
-# meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium
-#===========================================================================
-# 4- Get Amazon Product Profile
-#===========================================================================
+    #===========================================================================
+    # Now use the Main Product Page to get all the Fields of Amazon_Product Object
+    # meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium
+    #===========================================================================
+    # 4- Get Amazon Product Profile
+    #===========================================================================
 
     Amazon_Product_ = get_Product_Profile(driver_,ASIN_)
 
 
     Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})
-#===========================================================================
-#Starting Scrapping
-#===========================================================================
+    #===========================================================================
+    #Starting Scrapping
+    #===========================================================================
 
-#===========================================================================
-# 5- Loading the Page of All Reviews of the Product !!!
-#===========================================================================
+    #===========================================================================
+    # 5- Loading the Page of All Reviews of the Product !!!
+    #===========================================================================
 
     Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
 
-#===========================================================================
-# Saving All Reviews details about the Product in Amazon_Product_Data !!!
-#===========================================================================
+    #===========================================================================
+    # Saving All Reviews details about the Product in Amazon_Product_Data !!!
+    #===========================================================================
 
     Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
-#===========================================================================
+    #===========================================================================
 
-#===========================================================================
-# 6- Loading the Page of All Questions about the Product !!!
-#===========================================================================
+    #===========================================================================
+    # 6- Loading the Page of All Questions about the Product !!!
+    #===========================================================================
 
     Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
 
-#==============================================================================
+    #==============================================================================
 
-#===========================================================================
-# Saving All Questions details about the Product in Amazon_Product_Data !!!
-#===========================================================================
+    #===========================================================================
+    # Saving All Questions details about the Product in Amazon_Product_Data !!!
+    #===========================================================================
 
     Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
 
-#===========================================================================
+    #===========================================================================
 
-#===========================================================================
-# output the data as json file
-#===========================================================================
-    _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
+    #===========================================================================
+    # output the data as json file
+    #===========================================================================
+    if(_to_JSON):
+        _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
 
-#===========================================================================
-# here we get how much time is taken to execute this process
+    # ===========================================================================
+    # output the data as XLSX file
+    # ===========================================================================
+    if (Amazon_Product_Data):
+        _save_Data_to_XLSX('.\ASINs\\' + ASIN_ + '.xlsx', Amazon_Product_Data)
+
+    # ===========================================================================
+    # here we get how much time is taken to execute this process
 
     driver_.close()
 

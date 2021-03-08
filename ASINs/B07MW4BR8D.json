@@ -9,13 +9,85 @@
                 "Product_All_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews",
                 "Product_Positive_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=positive&pageNumber=1",
                 "Product_Critical_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=critical&pageNumber=1",
-                "Product_No_Of_Postivie_Reviewes": "8",
+                "Product_No_Of_Postivie_Reviewes": "16",
                 "Product_No_Of_Critical_Reviewes": "10",
                 "Product_Questions_URL": "https://www.amazon.com/ask/questions/asin/B07MW4BR8D/"
             }
         },
         {
             "Amazon Product Reviews": [
+                {
+                    "Reviewer_Name": "Gabby Anderson",
+                    "Review_Title": "Excellent Multi-use Universal Stylus Pen!!",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "15-06-2019",
+                    "Review_Text": "Your browser does not support HTML5 video.\n\n\n   I have 2 tablet,  It works with every touch screen I have such as my surface and ipad in video, So far I think this one is the best stylus I've ever purchased. Highly recommend. The fine tip works great on tablet screens and fine detail. It come with a micro-usb charging cord,  the pen top is magnetically attached over charging port. The price is reasonable compared to other stylus.Great Stylus, Perfect For Tablets, you can have a try.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Kevin Fisher",
+                    "Review_Title": "Accurate, holds charge!",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "21-04-2019",
+                    "Review_Text": "Wow, love this. I had a stylus that was similar but cheaper, it had replaceable tips, but this is sleeker, holds charge longer, and it’s more accurate. The tip is tiny and doesn’t need to be replaced. Super accurate and I love the color. I use it on my first generation iPad and I’m really happy I bought this stylus instead of a cheaper (cheaper made) one. Totally worth it.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "DuxDiva",
+                    "Review_Title": "My new favorite appendage.",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "04-01-2020",
+                    "Review_Text": "Great product. Nice weight, beautiful color (blue), click top, magnetic charger, everything about it is wonderful. Is great on my iPhone, amazing on iPad Pro, and was surprised that it worked on 3 of our 5 kindle fires (not beautully responsive like on Apple screen, but didn’t expect it to work on them at all). Ordered a similar product right after this to get another color and was not nearly as impressed. Please make more colors!",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Joni",
+                    "Review_Title": "Love it so far",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "13-06-2020",
+                    "Review_Text": "I’ve only had this for a week. So I can’t vouch for its durability. But he works great with my iPad Mini 4. I’m using it mostly for my coloring games as some of the areas are so tiny that my finger would not be able to tap onto the space to fill it. I still have to zoom in some cause it won’t get to super tiny spots, but I think its accuracy is probably identical to that of higher priced pencils.It’s about the same weight of a “good pen” not like a bic pen. LOL! Which makes handling much nicer. Clicks on and off like a pen, and lasts a while if you turn it off between uses. It does not require pairing. Works right out of the box.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Caden Fox",
+                    "Review_Title": "Excellent iPad and iPhone stylus pen",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "06-04-2020",
+                    "Review_Text": "Fantastic product, it’s easy to charge and compatible with both my Samsung S9 and my iPad.One thing to note is that the pen is quite sensitive, which might annoy some people but it’s great for anyone wanting to write or draw with this pen.This Stylus Pen has saved me a lot of time and effort.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Jonathan",
+                    "Review_Title": "Finally a stylus that works great!",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "13-09-2019",
+                    "Review_Text": "This is by far the best stylus I've purchased to date. It works with virtually any touch screen and is very accurate. Writing with it is flawless and feels natural. The magnetic charging snaps into place and is the quickest charging I've experienced with any stylus I've own before. It last longer than others I've owned as well. The copper tip is way better than those rubber, disk, or mesh tipped ones and won't degrade or need replacement. Overall this stylus rocks and would highly recommend to anyone looking for a sturdy, well built, and long lasting stylus.",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Luc E.",
+                    "Review_Title": "Awsome pen and won’t scratch your screen",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "23-12-2020",
+                    "Review_Text": "I was a bit hesitant to get this as it said it was a brass or copper tip and was scared it would scratch my new computers screen. But I was wrong. It glides very smoothly, the pen came fully charged , is sleek, and very easy to hold , feels like I’m writing with a pen. I love how reactive it is to the touch screen, and how smooth is travels on the surface of the screen. Very glad I got this one. Also came  with a lifetime warranty wich is really handy to have. If I’m doubt..I would def get this pen. I use it for 3D design and sketching and love it .",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
+                {
+                    "Reviewer_Name": "Logan Buckner",
+                    "Review_Title": "Lightweight and extremely accurate, with no pairing needed",
+                    "Review_Rating": "★★★★★",
+                    "Review_Date": "02-08-2019",
+                    "Review_Text": "One of the genius parts about it is that you can use it straight away; you dont have to pair it with Bluetooth, or download any apps, just charge it and youre good to go. A full charge only takes 60 minutes and then it lasts for ages, and it automatically powers down after 3 minutes to save the charge. I have a Huawei tablet, an iPhone, and a Samsung Galaxy S9 so to be able to use the stylus on each of these devices is incredible, and as Ive said before because no pairing in required, you can just move seamlessly from one to another. To charge it, you just install the magnetic cap and insert a micro USB cable, (which is included).",
+                    "Review_type": "Positive",
+                    "Review_ASIN_": "B07MW4BR8D"
+                },
                 {
                     "Reviewer_Name": "Gabby Anderson",
                     "Review_Title": "Excellent Multi-use Universal Stylus Pen!!",

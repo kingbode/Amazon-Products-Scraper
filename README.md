@@ -137,6 +137,6 @@ optional arguments:
 Amazon_Asin_V2.1.py
 =============================
 
-working on Adding option to output the data in csv formart
+Added the option to output the data in xlsx format as default and json as optional outcome if specified in the command line as -json 1
 
 =============================
