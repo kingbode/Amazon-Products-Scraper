@@ -1,0 +1,613 @@
+Index: Amazon_Asin_V2.1.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \\\r\n    get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \\\r\n    check_P_I\r\n\r\nfrom Amazon_Product import Amazon_Product\r\n\r\nimport time\r\n\r\nimport argparse\r\n\r\nimport sys\r\n\r\n# print(sys.executable)\r\n# print(sys.path)\r\n#===================================================================\r\n# Handling Application Arguments !!\r\n#===================================================================\r\n\r\nargs = None\r\n\r\nparser = argparse.ArgumentParser(description='to get Amazon Product Data, Reviews and Question')\r\n#-q 10 -r 10 -a B07MW4BR8D -v 1\r\nparser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required parameter', default=None)\r\nparser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional parameter ,if not set, the tool will collect all Product Reviews', default=None)\r\nparser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional parameter ,if not set, the tool will collect all Product Questions', default=None)\r\nparser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, \"0\" means to Hide , while \"1\" means to display it, Optional parameter ,if not set, the Browser will be invisibile', default=None)\r\n\r\ntry:\r\n    args = parser.parse_args()\r\n\r\n    # print(args)\r\n    # parser.exit(1)\r\n\r\nexcept:\r\n    # here , it means no arguments were entered, so display the Help and exit !!\r\n    print('===================================================================')\r\n    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1')\r\n    print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')\r\n    print('and the Browser will be invisible')\r\n    print('\\nand no need to put parameters in order !!')\r\n    print('===================================================================')\r\n    parser.print_help()\r\n    parser.exit(1)\r\n\r\n\r\n\r\n\r\n#===================================================================\r\n# ASIN Search Website\r\n# https://amazon-asin.com/asincheck/?product_id=B07MW4BR8D\r\n\r\n#===================================================================\r\n# Declaring variables\r\n#===================================================================\r\n\r\ntimeout = 5\r\n\r\n#  Arguments example : -A B07MW4BR8D -R 10 -Q 10\r\n# -A B07MW4BR8D\r\n# ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN\r\n\r\n# ASIN_ = input('Please Input Amazon Product ASIN : ')\r\nASIN_ = args.ASIN\r\n\r\nif(check_P_I(args.ReviewsCount)):\r\n    Reviews_limit = args.ReviewsCount\r\nelse:\r\n    Reviews_limit = None\r\n\r\nif(check_P_I(args.QuestionsCount)):\r\n    Question_limit = args.QuestionsCount\r\nelse:\r\n    Question_limit = None\r\n\r\nif(check_P_I(args.HideBrowser)):\r\n    _to_HideBrowser = bool(args.HideBrowser)\r\nelse:\r\n    _to_HideBrowser = True\r\n\r\n\r\nAmazon_URL_ = 'https://www.amazon.com'\r\n\r\nASIN_baseURL_ = 'https://www.amazon.com/dp/'\r\n\r\n\r\nfull_URL = ASIN_baseURL_ + ASIN_\r\n\r\n_ASIN_Validity = False\r\n\r\nRating_ = '★★★★★'\r\n\r\ntotalNumberOfReviews = 0\r\n\r\nPositive_Reviews_Count = 0\r\n\r\nCritical_Reviews_Count = 0\r\n\r\nAmazon_Product_Data = []\r\n\r\nReviews_List = []\r\n\r\nQuestions_List = []\r\n\r\nAmazon_Product_ = Amazon_Product()\r\n\r\n# Chrome_Driver_Path = r'.\\chromedriver.exe'\r\n\r\nheaders_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'}\r\n\r\n\r\n#==========================================================================================================\r\n# Process time measuring\r\nstart_time = time.time()\r\n#==========================================================================================================\r\n#==========================================================================================================\r\n#=============================================== Main Application =========================================\r\n#==========================================================================================================\r\n\r\n# 0- Checking ASIN Validity:\r\n\r\n_ASIN_Validity = _check_ASIN_Existance(full_URL)\r\n\r\n\r\n\r\n# 1- Initialize Web Driver:\r\n\r\nif _ASIN_Validity:\r\n    print('- Valid Product ASIN is being processed')\r\n\r\n    driver_ = initialize_WebDriver(_to_HideBrowser)\r\n\r\n# driver.get(URL_)\r\n# driver_ = initialize_WebDriver(Chrome_Driver_Path)\r\n\r\n#==========================================================================================================\r\n# 2- Visiting main Link of a given ASIN\r\n#==========================================================================================================\r\n\r\n    load_Procut_Page(full_URL,driver_)\r\n\r\n\r\n#==========================================================================================================\r\n# 3- bypassing nagging popup window for local country\r\n#==========================================================================================================\r\n\r\n    remove_Nagging_Window(driver_)\r\n\r\n#===========================================================================\r\n# Now use the Main Product Page to get all teh Fields of Amazon_Product Object\r\n# meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium\r\n#===========================================================================\r\n# 4- Get Amazon Product Profile\r\n#===========================================================================\r\n\r\n    Amazon_Product_ = get_Product_Profile(driver_,ASIN_)\r\n\r\n\r\n    Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})\r\n#===========================================================================\r\n#Starting Scrapping\r\n#===========================================================================\r\n\r\n#===========================================================================\r\n# 5- Loading the Page of All Reviews of the Product !!!\r\n#===========================================================================\r\n\r\n    Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)\r\n\r\n#===========================================================================\r\n# Saving All Reviews details about the Product in Amazon_Product_Data !!!\r\n#===========================================================================\r\n\r\n    Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})\r\n#===========================================================================\r\n\r\n#===========================================================================\r\n# 6- Loading the Page of All Questions about the Product !!!\r\n#===========================================================================\r\n\r\n    Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)\r\n\r\n#==============================================================================\r\n\r\n#===========================================================================\r\n# Saving All Questions details about the Product in Amazon_Product_Data !!!\r\n#===========================================================================\r\n\r\n    Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})\r\n\r\n#===========================================================================\r\n\r\n#===========================================================================\r\n# output the data as json file\r\n#===========================================================================\r\n    _save_Data_to_JSON('.\\ASINs\\\\' + ASIN_+ '.json', Amazon_Product_Data)\r\n\r\n#===========================================================================\r\n# here we get how much time is taken to execute this process\r\n\r\n    driver_.close()\r\n\r\n    print(\"--- %s seconds ---\" % (time.time() - start_time))\r\n\r\n\r\nelse:\r\n    print('- Product ASIN seems to be invalid or no longer exists in Amazon database')\r\n\r\n    print('hi')\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Amazon_Asin_V2.1.py b/Amazon_Asin_V2.1.py
+--- a/Amazon_Asin_V2.1.py	(revision e968cd92184dd009f73f2ac4089dceefc1ab4454)
++++ b/Amazon_Asin_V2.1.py	(date 1615232797580)
+@@ -1,6 +1,6 @@
+ from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
+     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
+-    check_P_I
++    check_P_I, _save_Data_to_XLSX
+ 
+ from Amazon_Product import Amazon_Product
+ 
+@@ -20,10 +20,13 @@
+ 
+ parser = argparse.ArgumentParser(description='to get Amazon Product Data, Reviews and Question')
+ #-q 10 -r 10 -a B07MW4BR8D -v 1
+-parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required parameter', default=None)
+-parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional parameter ,if not set, the tool will collect all Product Reviews', default=None)
+-parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional parameter ,if not set, the tool will collect all Product Questions', default=None)
+-parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional parameter ,if not set, the Browser will be invisibile', default=None)
++parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter', default=None)
++parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews', default=None)
++parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
++parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
++parser.add_argument('-json', '--json',required=False, type=int,help='to output the data in JSON format', default=None)
++
++
+ 
+ try:
+     args = parser.parse_args()
+@@ -47,7 +50,7 @@
+ 
+ #===================================================================
+ # ASIN Search Website
+-# https://amazon-asin.com/asincheck/?product_id=B07MW4BR8D
++# https://amazon-asin.com/asincheck/?product_id=BO7GKK5FQT
+ 
+ #===================================================================
+ # Declaring variables
+@@ -72,12 +75,20 @@
+ else:
+     Question_limit = None
+ 
+-if(check_P_I(args.HideBrowser)):
+-    _to_HideBrowser = bool(args.HideBrowser)
+-else:
+-    _to_HideBrowser = True
++if(args.HideBrowser == None):
++    _to_HideBrowser=True
++else:
++    if(check_P_I(args.HideBrowser)):
++        _to_HideBrowser = bool(args.HideBrowser)
++    else:
++        _to_HideBrowser = True
+ 
+ 
++if(check_P_I(args.json)):
++    _to_JSON = bool(args.json)
++
++
++
+ Amazon_URL_ = 'https://www.amazon.com'
+ 
+ ASIN_baseURL_ = 'https://www.amazon.com/dp/'
+@@ -129,73 +140,79 @@
+ 
+     driver_ = initialize_WebDriver(_to_HideBrowser)
+ 
+-# driver.get(URL_)
+-# driver_ = initialize_WebDriver(Chrome_Driver_Path)
++    # driver.get(URL_)
++    # driver_ = initialize_WebDriver(Chrome_Driver_Path)
+ 
+-#==========================================================================================================
+-# 2- Visiting main Link of a given ASIN
+-#==========================================================================================================
++    #==========================================================================================================
++    # 2- Visiting main Link of a given ASIN
++    #==========================================================================================================
+ 
+     load_Procut_Page(full_URL,driver_)
+ 
+-
+-#==========================================================================================================
+-# 3- bypassing nagging popup window for local country
+-#==========================================================================================================
++    #==========================================================================================================
++    # 3- bypassing nagging popup window for local country
++    #==========================================================================================================
+ 
+     remove_Nagging_Window(driver_)
+ 
+-#===========================================================================
+-# Now use the Main Product Page to get all teh Fields of Amazon_Product Object
+-# meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium
+-#===========================================================================
+-# 4- Get Amazon Product Profile
+-#===========================================================================
++    #===========================================================================
++    # Now use the Main Product Page to get all the Fields of Amazon_Product Object
++    # meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium
++    #===========================================================================
++    # 4- Get Amazon Product Profile
++    #===========================================================================
+ 
+     Amazon_Product_ = get_Product_Profile(driver_,ASIN_)
+ 
+ 
+     Amazon_Product_Data.append({'Amazon Product Profile':Amazon_Product_.__dict__})
+-#===========================================================================
+-#Starting Scrapping
+-#===========================================================================
++    #===========================================================================
++    #Starting Scrapping
++    #===========================================================================
+ 
+-#===========================================================================
+-# 5- Loading the Page of All Reviews of the Product !!!
+-#===========================================================================
++    #===========================================================================
++    # 5- Loading the Page of All Reviews of the Product !!!
++    #===========================================================================
+ 
+     Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
+ 
+-#===========================================================================
+-# Saving All Reviews details about the Product in Amazon_Product_Data !!!
+-#===========================================================================
++    #===========================================================================
++    # Saving All Reviews details about the Product in Amazon_Product_Data !!!
++    #===========================================================================
+ 
+     Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
+-#===========================================================================
++    #===========================================================================
+ 
+-#===========================================================================
+-# 6- Loading the Page of All Questions about the Product !!!
+-#===========================================================================
++    #===========================================================================
++    # 6- Loading the Page of All Questions about the Product !!!
++    #===========================================================================
+ 
+     Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
+ 
+-#==============================================================================
++    #==============================================================================
+ 
+-#===========================================================================
+-# Saving All Questions details about the Product in Amazon_Product_Data !!!
+-#===========================================================================
++    #===========================================================================
++    # Saving All Questions details about the Product in Amazon_Product_Data !!!
++    #===========================================================================
+ 
+     Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
+ 
+-#===========================================================================
++    #===========================================================================
+ 
+-#===========================================================================
+-# output the data as json file
+-#===========================================================================
+-    _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
++    #===========================================================================
++    # output the data as json file
++    #===========================================================================
++    if(_to_JSON):
++        _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
+ 
+-#===========================================================================
+-# here we get how much time is taken to execute this process
++    # ===========================================================================
++    # output the data as XLSX file
++    # ===========================================================================
++    if (Amazon_Product_Data):
++        _save_Data_to_XLSX('.\ASINs\\' + ASIN_ + '.xlsx', Amazon_Product_Data)
++
++    # ===========================================================================
++    # here we get how much time is taken to execute this process
+ 
+     driver_.close()
+ 
+Index: AmazonFunctionsV5.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\nimport datefinder\r\nimport requests\r\n\r\nfrom bs4 import BeautifulSoup\r\nfrom selenium import webdriver\r\nfrom selenium.common.exceptions import TimeoutException\r\nfrom selenium.webdriver.common.by import By\r\nfrom selenium.webdriver.support import expected_conditions as EC\r\nimport time\r\n\r\nfrom selenium.webdriver.support.wait import WebDriverWait\r\n\r\nfrom Amazon_Product import Amazon_Product\r\nfrom Review_Question import Review_Question\r\n\r\nimport errno\r\nimport json\r\nimport os\r\nfrom random import randint\r\nfrom webdriver_manager.chrome import ChromeDriverManager\r\n\r\n\r\n\r\n#===================================================================\r\n# Declaring variables\r\n#===================================================================\r\n\r\ntimeout = 5\r\n\r\nASIN_ = 'B07MW4BR8D'  # this is a sample ASIN\r\n\r\nAmazon_URL_ = 'https://www.amazon.com'\r\n\r\nASIN_baseURL_ = 'https://www.amazon.com/dp/'\r\n\r\n\r\nfull_URL = ASIN_baseURL_ + ASIN_\r\n\r\nRating_ = '★★★★★'\r\n\r\ntotalNumberOfReviews = 0\r\n\r\nPositive_Reviews_Count = 0\r\n\r\nCritical_Reviews_Count = 0\r\n\r\nAmazon_Product_Data = []\r\n\r\nReviews_List = []\r\n\r\nQuestions_List = []\r\n\r\nQuestions_List = []\r\n\r\nAmazon_Product_ = Amazon_Product()\r\n\r\nChrome_Driver_Path = r'.\\chromedriver.exe'\r\n\r\nheaders_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'}\r\n\r\n\r\n\r\n# ==========================================================================================================\r\n# Initiating Webdriver\r\n# ==========================================================================================================\r\ndef initialize_WebDriver(_hideBrowser):\r\n\r\n    print('- Initializing ...')\r\n\r\n    options = webdriver.ChromeOptions()\r\n\r\n    options.add_experimental_option(\"excludeSwitches\", [\"ignore-certificate-errors\"])\r\n    options.add_experimental_option(\"useAutomationExtension\", True)\r\n    options.add_argument('--disable-gpu')\r\n    #How to turn off command line logging in Selenium using Chrome in Python\r\n    options.add_argument(\"--log-level=3\")\r\n    # to hide the browser\r\n    if(_hideBrowser):\r\n        options.add_argument('--headless')\r\n\r\n    # ChromeDriverManager helps you avoid below error\r\n\r\n    \"\"\" \r\n    selenium.common.exceptions.SessionNotCreatedException: Message: session not created: This version of ChromeDriver only supports Chrome version 80\r\n\r\n    \"\"\"\r\n    driver_ = webdriver.Chrome(ChromeDriverManager().install(), options=options)\r\n\r\n    return driver_\r\n\r\n\r\n# ==========================================================================================================\r\n# Visiting main Link of a given ASIN\r\n# ==========================================================================================================\r\n\r\ndef _check_ASIN_Existance(url_):\r\n\r\n    cookies = {\r\n        'aws_lang': 'en',\r\n        'c_m': 'undefinedwww.quora.comOther%20Natural%20Referrersundefined',\r\n        's_cc': 'true',\r\n        's_sq': '%5B%5BB%5D%5D',\r\n        's_eVar60': 'ft_card',\r\n        'skin': 'noskin',\r\n        'session-id': '136-6213593-5967538',\r\n        'session-id-time': '2082787201l',\r\n        'i18n-prefs': 'USD',\r\n        'sp-cdn': 'L5Z9:KW',\r\n        'csm-hit': 'tb:AN7EWR668Q5JCTXTVRP2+b-AN7EWR668Q5JCTXTVRP2|1613837223659&t:1613837223659&adb:adblk_yes',\r\n        'ubid-main': '135-5950261-3540542',\r\n        'session-token': 'tUsF3fpJYnyOruyDOPSt7iWG6eWkP19RRHdlOa0Rk4PqAgnzUke+TGw0ieU/RyI++mU3qx/Mo916iGoojSb/WQV7GQzwCKiCYSr+JOTmixG0yZhf6zsDJ7fwbqEDDkTmxoj70xOb9LeyCLSr69I04ogNT9vg7K6aBUFS3emUSRI6+i0e6BAp5z0jbwFA60A5',\r\n        'lc-main': 'en_US',\r\n    }\r\n\r\n    headers = {\r\n        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0',\r\n        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',\r\n        'Accept-Language': 'en-US,en;q=0.5',\r\n        'Connection': 'keep-alive',\r\n        'Upgrade-Insecure-Requests': '1',\r\n    }\r\n\r\n    response = requests.get(url_, headers=headers, cookies=cookies)\r\n\r\n    if response.status_code==200:\r\n        return True\r\n    elif response.status_code!=200:\r\n        return False\r\n\r\n\r\n        #Sorry! We couldn't find that page. Try searching or go to Amazon's home page.\r\n\r\n\r\n\r\ndef load_Procut_Page(url_,driver_):\r\n\r\n    # print('- Valid Product ASIN is being processed')\r\n\r\n    driver_.get(url_)\r\n\r\n\r\n\r\n\r\n#==========================================================================================================\r\n#bypassing nagging popup window for local country\r\n#==========================================================================================================\r\n\r\ndef remove_Nagging_Window(driver_):\r\n    while True:\r\n        try:\r\n            if driver_.switch_to.active_element:\r\n                if WebDriverWait(driver_, timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id=\"nav-main\"]/div[1]/div/div/div[3]/span[1]'))):\r\n                # if WebDriverWait(driver_, timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id=\"nav-main\"]/div[1]/div[2]/div/div[3]/span[1]/span/input'))):\r\n                    # driver_.find_element_by_xpath('//*[@id=\"nav-main\"]/div[1]/div[2]/div/div[3]/span[1]/span/input').click()\r\n                    driver_.find_element_by_xpath('//*[@id=\"nav-main\"]/div[1]/div/div/div[3]/span[1]').click()\r\n                    print('- Passed Nagging window for Country')\r\n                    return True\r\n                    # break\r\n\r\n        except TimeoutException: #TimeoutException:\r\n            print('- Still trying to pass Nagging window for Country')\r\n            pass\r\n            # print (\"- ===> Timed out waiting for page to load\")\r\n\r\n#===========================================================================\r\n# Now use the Main Product Page to get all teh Fields of Amazon_Product Object\r\n# meaning all URLs required to visit , to save time going back and forth, or trying to find them using Selenium\r\n#===========================================================================\r\n# Loading the Product Page !!!\r\n#===========================================================================\r\n# scroll to the bottom in order to load all the page contents\r\n\r\n\r\n\r\n\r\ndef get_Product_Profile(driver_,ASIN_):\r\n\r\n    driver_.execute_script(\"window.scrollTo(0, document.body.scrollHeight);\")\r\n    _delay_(3)\r\n\r\n    amazon_page_ = driver_.page_source\r\n\r\n    Amazon_Product_ = Amazon_Product()\r\n\r\n\r\n    if amazon_page_:\r\n        # ===========================================================================\r\n        # get Product Title\r\n        # ===========================================================================\r\n        soup_Main = BeautifulSoup(amazon_page_ ,\"html.parser\")\r\n        Product_Title = soup_Main.find('span' , {'id':'productTitle'}).text.rstrip().lstrip()\r\n        Product_Price = soup_Main.find('span' , {'id':'priceblock_ourprice'}).text.rstrip().lstrip()\r\n        print('- got Product Title Successfully')\r\n\r\n        # ===========================================================================\r\n        # get All_reviews_link\r\n        # ===========================================================================\r\n        All_reviews_link = soup_Main.find('div', {'id': 'reviews-medley-footer'}).find('a')['href']\r\n        All_reviews_link = Amazon_URL_ + All_reviews_link\r\n        # print('- got All_reviews_link Successfully , from Main Page of the product using Soup')\r\n        print('- got All_reviews_link Successfully , from Main Page of the product')\r\n\r\n        # ===========================================================================\r\n        # get All_Questions_link\r\n        # ===========================================================================\r\n        # All_Questions_link = soup_Main.find('div', {'class': 'a-section askTopQandALoadMoreQuestions'}).find('a')['href']\r\n        # All_Questions_link = Amazon_URL_ + All_Questions_link\r\n        All_Questions_link = 'https://www.amazon.com/ask/questions/asin/' + ASIN_ + '/'\r\n\r\n        # print('- got All_Questions_link Successfully , from Main Page of the product using Soup')\r\n        print('- got All_Questions_link Successfully , from Main Page of the product')\r\n\r\n        # ===========================================================================\r\n        # Passing collected Data about teh Product to Amazon_Product Object\r\n        # ===========================================================================\r\n        Amazon_Product_.Product_ASIN = ASIN_\r\n\r\n        Amazon_Product_.Product_Title = Product_Title\r\n        Amazon_Product_.Product_Price = Product_Price\r\n        # Main Product URL\r\n        Amazon_Product_.Product_URL = ASIN_baseURL_ + ASIN_\r\n        # All Reviews URL\r\n        Amazon_Product_.Product_All_Reviews_URL = All_reviews_link  # driver.current_url\r\n        # All Product Questions\r\n        Amazon_Product_.Product_Questions_URL = All_Questions_link\r\n\r\n        print('- Product Profile has been updated ...')\r\n\r\n        return Amazon_Product_\r\n\r\n#===========================================================================\r\n# 5- Loading the Page of All Reviews of the Product !!!\r\n#===========================================================================\r\ndef get_All_Product_Reviews(driver_,Amazon_Product_,_Reviews_limit=None):\r\n    # ===========================================================================\r\n    # Loading the Page of All Reviews of the Product !!!\r\n    # ===========================================================================\r\n\r\n    Reviews_List = []\r\n\r\n    print('- Getting All Product Reviews ...')\r\n\r\n    driver_.get(Amazon_Product_.Product_All_Reviews_URL)\r\n\r\n    # scroll to the bottom in order to load all the page contents\r\n    driver_.execute_script(\"window.scrollTo(0, document.body.scrollHeight);\")\r\n    _delay_(3)\r\n\r\n    amazon_Review_page_ = driver_.page_source\r\n\r\n    # ===========================================================================\r\n    # Read Total Number of reviews , Positive and Critical Reviews , and URLs for both pages\r\n    # & Passing collected Data about the Product to Amazon_Product Object\r\n    # ===========================================================================\r\n\r\n    soup_Reviews = BeautifulSoup(amazon_Review_page_, \"html.parser\")\r\n\r\n    # for Positive and Critical Reviews\r\n    _Reviews_Links = soup_Reviews.findAll('a', {'class': 'a-size-base a-link-normal see-all'})\r\n\r\n\r\n\r\n    try:\r\n        # Amazon_Product_.Product_Positive_Reviews_URL = Amazon_URL_ + _Reviews_Links[0]['href']\r\n        Amazon_Product_.Product_Positive_Reviews_URL = Amazon_Product_.Product_All_Reviews_URL + '&filterByStar=positive&pageNumber=1'\r\n    except:\r\n        pass\r\n\r\n    try:\r\n        # Amazon_Product_.Product_Critical_Reviews_URL = Amazon_URL_ + _Reviews_Links[1]['href']\r\n        Amazon_Product_.Product_Critical_Reviews_URL = Amazon_Product_.Product_All_Reviews_URL + '&filterByStar=critical&pageNumber=1'\r\n    except:\r\n        pass\r\n\r\n\r\n\r\n    # ===========================================================================\r\n    # Saving Amazon_Product_ in Amazon_Product_Data\r\n    # ===========================================================================\r\n    # adding .__dict__ saves my object from errors when saving in json formats\r\n    Amazon_Product_Data.append({'Amazon Product Information': Amazon_Product_.__dict__})\r\n\r\n    # ===========================================================================\r\n    # Loading the Page of All Positive Reviews of the Product !!!\r\n    # ===========================================================================\r\n\r\n    driver_.get(Amazon_Product_.Product_Positive_Reviews_URL)\r\n\r\n    # ==============================================================================\r\n    # here , you have to make sure that page finished loading then read its source\r\n\r\n    # use below trick to make sure that page has been loaded successfully, by searching for the item that you will check later after page is loaded\r\n\r\n    # and don't go any way until you make sure your item exist !!\r\n\r\n    delay_ = 3  # seconds\r\n\r\n    while True:   # <==== for Positive Reviews\r\n        try:\r\n            myElem = WebDriverWait(driver_, delay_).until(\r\n                # EC.presence_of_element_located((By.XPATH, '//*[@id=\"cm_cr-rvw_summary-viewpoints\"]'))) # <==== old indication for Positive Reviews\r\n                EC.presence_of_element_located((By.XPATH, '//*[@id=\"reviews-filter-info-segment\"]')))  # <==== new indication for Positive Reviews\r\n\r\n            if myElem:\r\n                print('- Positive Reviews Page is ready!')\r\n                break\r\n\r\n        except TimeoutException:\r\n\r\n            print('- Reviews Page loading took too much time!.. but am still trying for it !')\r\n\r\n    # ==============================================================================\r\n    print('- Getting All Positive Reviews ...')\r\n    # loop here for all positive reviews pages\r\n\r\n    NoMoreReviewPages = False\r\n\r\n    _tmpReview_Counter = 0\r\n\r\n    while True:\r\n\r\n        try:\r\n            if NoMoreReviewPages or _tmpReview_Counter>=_Reviews_limit:\r\n                NoMoreReviewPages = False  # Exit from the While loop when NoMoreReviewPages\r\n                break\r\n            # delay(2)\r\n            # get the results of the first page\r\n            webPageSource = driver_.page_source\r\n\r\n            # parse and get the urls for the results\r\n\r\n            soup = BeautifulSoup(webPageSource, \"html.parser\")\r\n\r\n            Reviews_Data_Set_ = data_ = soup.findAll('div', {'class': 'a-section review aok-relative'})\r\n\r\n            for i in range(0, len(Reviews_Data_Set_)):\r\n\r\n                Review_tmp = Review_Question.Review_()\r\n                Review_tmp.Review_ASIN_ = ASIN_\r\n                Review_tmp.Review_type = 'Positive'\r\n\r\n                try:\r\n                    Review_tmp.Reviewer_Name = Reviews_Data_Set_[i].findAll('div', {'class': 'a-profile-content'})[\r\n                        0].text\r\n                    Review_tmp.Review_Rating = Rating_[:int(\r\n                        Reviews_Data_Set_[i].findAll('a', {'class': 'a-link-normal'})[0].text[0])]\r\n                    Review_tmp.Review_Title = Reviews_Data_Set_[i].findAll('a', {\r\n                        'class': 'a-size-base a-link-normal review-title a-color-base review-title-content a-text-bold'})[\r\n                        0].text.rstrip().lstrip()\r\n\r\n                    tempDate = \\\r\n                    Reviews_Data_Set_[i].findAll('span', {'class': 'a-size-base a-color-secondary review-date'})[0].text\r\n                    tempDate_ = list(datefinder.find_dates(tempDate))\r\n                    Review_tmp.Review_Date = tempDate_[0].strftime(\"%d-%m-%Y\")\r\n\r\n                    Review_tmp.Review_Text = \\\r\n                    Reviews_Data_Set_[i].findAll('span', {'class': 'a-size-base review-text review-text-content'})[\r\n                        0].text.rstrip().lstrip()\r\n\r\n                    # adding .__dict__ saves my object from errors when saving in json formats\r\n\r\n                    if Review_tmp not in Reviews_List:\r\n                        Reviews_List.append(Review_tmp.__dict__)\r\n\r\n                        #incrementing the counter of reviews, to stop at _Review_limit if was set\r\n                        _tmpReview_Counter +=1\r\n\r\n\r\n                except:\r\n                    pass\r\n\r\n            # now you finished results of the first page, please click next and fetch results of the next paga and so on until you reach the number of pages you set\r\n\r\n            while True:\r\n                try:\r\n                    time.sleep(1)\r\n                    # delay(2)\r\n                    if WebDriverWait(driver_, timeout).until(\r\n                            EC.presence_of_element_located((By.CSS_SELECTOR, '.a-last > a:nth-child(1)'))):\r\n                        driver_.find_element_by_css_selector('.a-last > a:nth-child(1)').click()\r\n                        break\r\n\r\n                    # else:\r\n                    #     NoMoreReviewPages = True\r\n                    #     break # No More Pages for Positive Reviews\r\n\r\n                # except NoSuchElementException:\r\n                #     break\r\n                except:\r\n                    # you can put here timer for timeout operation and exit this loop\r\n                    NoMoreReviewPages = True\r\n                    # to get count of positive reviews !!\r\n\r\n                    # No More Pages for Positive Reviews\r\n                    print(\"- ===> Timed out waiting for page to load\")\r\n                    break\r\n        except:\r\n            pass\r\n\r\n    # to get count of positive reviews !!\r\n\r\n    Amazon_Product_.Product_No_Of_Postivie_Reviewes = str(len(Reviews_List))\r\n\r\n    print('- All Positive Reviews had been collected !')\r\n\r\n    print('- There are ', Amazon_Product_.Product_No_Of_Postivie_Reviewes, 'Positive Reviews ...')\r\n\r\n\r\n\r\n\r\n    # As all reviews for positive and critical will be saved in this object at he end\r\n    # Amazon_Product_.Product_Reviews = Reviews_List\r\n    # ===========================================================================\r\n\r\n    # ===========================================================================\r\n    # Loading the Page of All Critical Reviews of the Product !!!\r\n    # ===========================================================================\r\n\r\n    driver_.get(Amazon_Product_.Product_Critical_Reviews_URL)\r\n\r\n    # ==============================================================================\r\n    # here , you have to make sure that page finished loading then read its source\r\n\r\n    # use below trick to make sure that page has been loaded successfully, by searching for the item that you will check later after page is loaded\r\n\r\n    # and don't go any way until you make sure your item exist !!\r\n\r\n    delay_ = 3  # seconds\r\n\r\n    while True:\r\n        try:\r\n            myElem = WebDriverWait(driver_, delay_).until(\r\n                # EC.presence_of_element_located((By.XPATH, '//*[@id=\"cm_cr-rvw_summary-viewpoints\"]'))) # <==== old indication for Positive Reviews\r\n                EC.presence_of_element_located((By.XPATH, '//*[@id=\"reviews-filter-info-segment\"]'))) # <==== new indication for Positive Reviews\r\n\r\n            if myElem:\r\n                print('- Critical Reviews Page is ready!')\r\n                break\r\n\r\n        except TimeoutException:\r\n\r\n            print('- Reviews Page loading took too much time!.. but am still trying for it !')\r\n\r\n    # ==============================================================================\r\n    # loop here for all critical reviews pages\r\n    print('- Getting All Critical Reviews ...')\r\n\r\n    NoMoreReviewPages = False\r\n\r\n    _tmpReview_Counter = 0\r\n\r\n    while True:\r\n\r\n        try:\r\n            if NoMoreReviewPages or _tmpReview_Counter>=_Reviews_limit:\r\n                NoMoreReviewPages = False  # Exit from the While loop when NoMoreReviewPages\r\n                break\r\n            # delay(2)\r\n            # get the results of the first page\r\n            webPageSource = driver_.page_source\r\n\r\n            # parse and get the urls for the results\r\n\r\n            soup = BeautifulSoup(webPageSource, \"html.parser\")\r\n\r\n            Reviews_Data_Set_ = data_ = soup.findAll('div', {'class': 'a-section review aok-relative'})\r\n\r\n            for i in range(0, len(Reviews_Data_Set_)):\r\n\r\n                Review_tmp = Review_Question.Review_()\r\n\r\n                Review_tmp.Review_ASIN_ = ASIN_\r\n                Review_tmp.Review_type = 'Critical'\r\n\r\n                try:\r\n                    Review_tmp.Reviewer_Name = Reviews_Data_Set_[i].findAll('div', {'class': 'a-profile-content'})[\r\n                        0].text\r\n                    Review_tmp.Review_Rating = Rating_[:int(\r\n                        Reviews_Data_Set_[i].findAll('a', {'class': 'a-link-normal'})[0].text[0])]\r\n                    Review_tmp.Review_Title = Reviews_Data_Set_[i].findAll('a', {\r\n                        'class': 'a-size-base a-link-normal review-title a-color-base review-title-content a-text-bold'})[\r\n                        0].text.rstrip().lstrip()\r\n\r\n                    tempDate = \\\r\n                    Reviews_Data_Set_[i].findAll('span', {'class': 'a-size-base a-color-secondary review-date'})[0].text\r\n                    tempDate_ = list(datefinder.find_dates(tempDate))\r\n                    Review_tmp.Review_Date = tempDate_[0].strftime(\"%d-%m-%Y\")\r\n\r\n                    Review_tmp.Review_Text = \\\r\n                    Reviews_Data_Set_[i].findAll('span', {'class': 'a-size-base review-text review-text-content'})[\r\n                        0].text.rstrip().lstrip()\r\n\r\n                    # adding .__dict__ saves my object from erros when saving in json formats\r\n\r\n                    if Review_tmp not in Reviews_List:\r\n                        Reviews_List.append(Review_tmp.__dict__)\r\n\r\n                        # incrementing the counter of reviews, to stop at _Review_limit if was set\r\n                        _tmpReview_Counter += 1\r\n\r\n                except:\r\n                    pass\r\n\r\n            # now you finished results of the first page, please click next and fetch results of the next paga and so on until you reach the number of pages you set\r\n\r\n            while True:\r\n                try:\r\n                    time.sleep(1)\r\n                    # delay(2)\r\n                    if WebDriverWait(driver_, timeout).until(\r\n                            EC.presence_of_element_located((By.CSS_SELECTOR, '.a-last > a:nth-child(1)'))):\r\n                        driver_.find_element_by_css_selector('.a-last > a:nth-child(1)').click()\r\n                        break\r\n\r\n                    # else:\r\n                    #     NoMoreReviewPages = True\r\n                    #     break # No More Pages for Positive Reviews\r\n\r\n                # except NoSuchElementException:\r\n                #     break\r\n                except:\r\n                    # you can put here timer for timeout operation and exit this loop\r\n                    NoMoreReviewPages = True\r\n\r\n                    # No More Pages for Positive Reviews\r\n                    print(\"- ===> Timed out waiting for page to load\")\r\n                    break\r\n        except:\r\n            pass\r\n\r\n    # to get count of critical reviews !!\r\n    Amazon_Product_.Product_No_Of_Critical_Reviewes = str(abs(len(Reviews_List) - int(Amazon_Product_.Product_No_Of_Postivie_Reviewes)))\r\n\r\n    print('- All Critical Reviews had been collected !')\r\n\r\n    print('- There are ', Amazon_Product_.Product_No_Of_Critical_Reviewes, 'Critical Reviews ...')\r\n\r\n    return Reviews_List\r\n\r\n#===========================================================================\r\n# 6- Loading the Page of All Questions about the Product !!!\r\n#===========================================================================\r\ndef get_All_PrdocutQuestions(driver_,Amazon_Product_, _Question_limit = None):\r\n    # ===========================================================================\r\n    # Loading the Page of All Questions about the Product !!!\r\n    # ===========================================================================\r\n\r\n    Questions_List = []\r\n\r\n    driver_.get(Amazon_Product_.Product_Questions_URL)\r\n\r\n    # ==============================================================================\r\n    # here , you have to make sure that page finished loading then read its source\r\n\r\n    # use below trick to make sure that page has been loaded successfully, by searching for the item that you will check later after page is loaded\r\n\r\n    # and don't go any way until you make sure your item exist !!\r\n\r\n    delay_ = 3  # seconds\r\n\r\n    while True:\r\n        try:\r\n            myElem = WebDriverWait(driver_, delay_).until(\r\n                EC.presence_of_element_located((By.CSS_SELECTOR, 'div.celwidget:nth-child(5)')))\r\n                # EC.presence_of_element_located((By.CSS_SELECTOR, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div/h2')))\r\n\r\n            if myElem:\r\n                print('- Questions Page is ready!')\r\n                break\r\n\r\n        except TimeoutException:\r\n\r\n            print('- Questions Page loading took too much time!.. but am still trying for it !')\r\n\r\n    # ==============================================================================\r\n    # ==============================================================================\r\n    # loop here for all Questions pages\r\n    print('- Getting All Questions ...')\r\n\r\n    NoMoreQuestionsPages = False\r\n\r\n    _tmpQuestion_Counter = 0\r\n\r\n    while True:\r\n\r\n        try:\r\n            if NoMoreQuestionsPages or _tmpQuestion_Counter >= _Question_limit:\r\n                NoMoreQuestionsPages = False  # Exit from the While loop when NoMoreReviewPages\r\n                break\r\n            # delay(2)\r\n            # get the results of the first page\r\n            webPageSource = driver_.page_source\r\n\r\n            # parse and get the urls for the results\r\n\r\n            soup = BeautifulSoup(webPageSource, \"html.parser\")\r\n\r\n            Questions_Data_Set_ = soup.findAll('div', {'class': 'a-fixed-left-grid a-spacing-base'})\r\n\r\n            for i in range(0, len(Questions_Data_Set_)):\r\n\r\n                if i % 2 == 0:\r\n                    Question_Answer_tmp = Review_Question.Quesion_()\r\n                    Question_Answer_tmp.Question_ASIN_ = ASIN_\r\n\r\n                try:\r\n\r\n                    Questions_Data_Set_Sub_ = Questions_Data_Set_[i].findAll('span')\r\n\r\n                    if i % 2 == 0:\r\n                        Question_Answer_tmp.Question_ = Questions_Data_Set_Sub_[6].text.rstrip().lstrip()\r\n                        # print( Questions_Data_Set_Sub_[6].text.rstrip().lstrip())\r\n\r\n                    else:\r\n                        if len(Questions_Data_Set_Sub_) > 1:\r\n                            Question_Answer_tmp.Answer_ = fixed_longAnswer(\r\n                                Questions_Data_Set_Sub_[1].text.rstrip().lstrip())\r\n                        else:\r\n                            Question_Answer_tmp.Answer_ = 'Would You please Answer this Question.'\r\n\r\n                        # print(fixed_longAnswer(Questions_Data_Set_Sub_[1].text.rstrip().lstrip()))\r\n                    if i % 2 != 0 and i > 0:\r\n                        if Question_Answer_tmp not in Questions_List:\r\n                            Questions_List.append(Question_Answer_tmp.__dict__)\r\n\r\n                            # incrementing the counter of reviews, to stop at _Review_limit if was set\r\n                            _tmpQuestion_Counter += 1\r\n\r\n                except:\r\n                    pass\r\n\r\n            # now you finished results of the first page, please click next and fetch results of the next paga and so on until you reach the number of pages you set\r\n\r\n            while True:\r\n                try:\r\n                    time.sleep(1)\r\n                    # delay(2)\r\n                    if WebDriverWait(driver_, timeout).until(\r\n                            EC.presence_of_element_located((By.CSS_SELECTOR, '.a-last > a:nth-child(1)'))):\r\n                        driver_.find_element_by_css_selector('.a-last > a:nth-child(1)').click()\r\n                        break\r\n\r\n\r\n                except:\r\n                    # you can put here timer for timeout operation and exit this loop\r\n                    NoMoreQuestionsPages = True\r\n                    # No More Pages for Positive Reviews\r\n                    print(\"- ===> Timed out waiting for page to load\")\r\n                    break\r\n        except:\r\n            pass\r\n\r\n    print('- All Questions regarding the Product had been collected !')\r\n\r\n    return Questions_List\r\n\r\n\r\n\r\n\"\"\" _save_Data_to_JSON  : function that takes data list (array) and save it in JSON file \"\"\"\r\ndef _save_Data_to_JSON(JSON_filename_, *DataSet):\r\n    \"\"\" save_Data_to_JSON: function that takes data list (array) and save it in JSON file \"\"\"\r\n\r\n    if not os.path.exists(os.path.dirname(JSON_filename_)):\r\n        try:\r\n            os.makedirs(os.path.dirname(JSON_filename_))\r\n        except OSError as exc:  # Guard against race condition\r\n            if exc.errno != errno.EEXIST:\r\n                raise\r\n\r\n    with open(JSON_filename_, \"w\", encoding='utf-8') as f:\r\n        json.dump(DataSet, f, ensure_ascii=False, indent=4)\r\n\r\n    f.close()\r\n\r\n\r\n\r\n\r\n\r\n\r\n# function to trim Amazon Question's answer\r\ndef fixed_longAnswer(answerText):\r\n\r\n    if ' see more' in answerText or ' see less' in answerText:\r\n        zz = answerText.replace('\\n\\n', '\\n').replace(' see less', '').replace(' see more', ' $$$$').replace('                ',' ')\r\n\r\n        qq = slicer(zz, ' $$$$').replace('$$$$', '').rstrip().lstrip()\r\n\r\n        return qq\r\n\r\n    else: return answerText\r\n\r\n# function to cut string starting from a specific index of string\r\ndef slicer(my_str,sub):\r\n    index=my_str.find(sub)\r\n    if index !=-1 :\r\n        return my_str[index:]\r\n    else :\r\n        raise Exception('Sub string not found!')\r\n\r\n\r\n#=======================================================\r\n\"\"\" _get_WebPage_Source_Using_Request_Get : this function is used to get the webPage source of a given URL using Request and Get Methods \"\"\"\r\n\r\ndef _get_WebPage_Source_Using_Request_Get(url):\r\n\r\n    session_requests = requests.session()\r\n\r\n    result = session_requests.get(url, headers=headers_)\r\n    # result = session_requests.get(url)\r\n\r\n    return result.text\r\n\r\n\r\ndef _get_WebPage_Source_Using_Chrome_WebDriver(url, webPage_filename=None, savePage=False):\r\n    \"\"\" get the webpage source and save it in a folder with the datetime attribute \"\"\"\r\n    # options to start Chrome in headless mode.\r\n    options = webdriver.ChromeOptions()\r\n    options.add_experimental_option(\"excludeSwitches\", [\"ignore-certificate-errors\"])\r\n    options.add_argument('--disable-gpu')\r\n\r\n    #If you want chrome and chromedriver to stay open afterward, you can add the detach option when starting chromedriver:\r\n\r\n    options.add_experimental_option(\"detach\", True)\r\n    # to hide the broswer\r\n    # options.add_argument('--headless')\r\n\r\n    browser = webdriver.Chrome(executable_path = Chrome_Driver_Path, chrome_options=options)\r\n\r\n    # browser = webdriver.Chrome() #executable_path=os.path.abspath(“chromedriver\"), chrome_options = chrome_options)\r\n    # browser = webdriver.Chrome()\r\n    browser.get(url)\r\n\r\n    webPage = browser.page_source\r\n\r\n    # browser.quit()\r\n\r\n    # option to save the webpage to file\r\n\r\n    if savePage:\r\n\r\n        if not os.path.exists(os.path.dirname(webPage_filename)):\r\n            try:\r\n                os.makedirs(os.path.dirname(webPage_filename))\r\n            except OSError as exc:\r\n                if exc.errno != errno.EEXIST:\r\n                    raise\r\n\r\n        with open(webPage_filename, \"w\", encoding='utf-8') as f:\r\n            f.write(webPage)\r\n\r\n    return webPage\r\n\r\n# ==========================================================================================================\r\ndef _delay_(n):\r\n    time.sleep(randint(2, n))\r\n\r\n\r\ndef check_P_I(_number):\r\n\r\n    try:\r\n        if(int(_number)):\r\n            x=int(_number)\r\n            if(x>=0):\r\n                return True\r\n        else:\r\n            return False\r\n    except:\r\n        return False\r\n\r\n#=======================================================\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/AmazonFunctionsV5.py b/AmazonFunctionsV5.py
+--- a/AmazonFunctionsV5.py	(revision e968cd92184dd009f73f2ac4089dceefc1ab4454)
++++ b/AmazonFunctionsV5.py	(date 1615233214969)
+@@ -1,3 +1,4 @@
++import csv
+ 
+ import datefinder
+ import requests
+@@ -19,7 +20,7 @@
+ import os
+ from random import randint
+ from webdriver_manager.chrome import ChromeDriverManager
+-
++import pandas as pd
+ 
+ 
+ #===================================================================
+@@ -769,3 +770,117 @@
+         return False
+ 
+ #=======================================================
++
++
++""" _Json_to_CSV_   : Takes input argment ( JSON file and convert it o CSV file in same folder with same name but with csv extension """
++def _Json_to_CSV_Reviews(_data2):
++
++    ofilename = '_Reviews_tmp.csv'
++
++    ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
++    # ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
++
++    fields = list(_data2[0])
++
++    writer = csv.DictWriter(ofile, fieldnames=fields)
++
++    headers = {'Reviewer_Name': 'Reviewer Name',
++                         'Review_Title': 'Review Title',
++                         'Review_Rating': 'Review Rating',
++                         'Review_Date': 'Review Date',
++                         'Review_Text': 'Review Text',
++                         'Review_type': 'Review type',
++                         'Review_ASIN_': 'Review ASIN_'}
++
++    writer.writerow(headers)
++
++    for row in _data2:
++        writer.writerow(row['Reviewer_Name'].encode('Cp1250').decode('Cp1250').strip())
++
++    # csv_file = csv.writer(ofile)
++    # csv_file.writerow(
++    #     ["ASIN", "Reviewer_Name","Date", "Rating", "Review_Title", "Review_Text",  "Review_type" ])
++    # for i in range(0, len(_data) - 1):
++    #
++    #
++    #     csv_file.writerow([_data[i]['Review_ASIN_'],
++    #                        _data[i]['Reviewer_Name'].encode('utf-8').decode('utf-8').strip(),
++    #                        _data[i]['Review_Date'].encode('utf-8').decode('utf-8').strip(),
++    #                        len(_data[i]['Review_Rating'])*'★'.encode('utf-8').decode('utf-8').strip(),
++    #
++    #                        _data[i]['Review_Title'].encode('utf-8').decode('utf-8').strip(),
++    #                        _data[i]['Review_Text'].encode('utf-8').decode('utf-8').strip(),
++    #                        _data[i]['Review_type'].encode('utf-8').decode('utf-8').strip()])
++
++    ofile.close()
++
++#=======================================================
++def _Json_to_CSV_Questions(_data):
++
++    ofilename = '_Questions_tmp.csv'
++
++    ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
++
++    fields = list(_data[0])
++
++    writer = csv.DictWriter(ofile, fieldnames=fields)
++
++    writer.writerow({'Question_':'Question','Answer_':'Answer','Question_ASIN_':'ASIN'})
++
++    for row in _data:
++        writer.writerow(row)
++
++  # luv u dad
++
++
++    ofile.close()
++
++
++#=======================================================
++def _dicts_to_list(_dicts_list):
++
++    _tmp_list = []
++    # add columns as a first list
++    _tmp_list.append(list(_dicts_list[0].keys()))
++
++    for _dict in _dicts_list:
++        _tmp_list.append(list(_dict.values()))
++
++    return _tmp_list
++
++
++#=======================================================
++
++def _save_Data_to_XLSX(_to_file,_Amazon_Product_Data):
++
++
++    Product_Profile = {}
++    Product_Reviews = {}
++    Product_Questions = {}
++
++    Product_Profile = _Amazon_Product_Data[0]['Amazon Product Profile']
++    Product_Reviews = _Amazon_Product_Data[1]['Amazon Product Reviews']
++    Product_Questions = _Amazon_Product_Data[2]['Amazon Product Questions']
++    # Add your data in list, which may contain a dictionary with the name of the
++    # columns as the keys
++    # df1 = pd.DataFrame({'Product_Profile': Product_Profile})
++
++    tmp_2 = _dicts_to_list(Product_Reviews)
++    tmp_3 = _dicts_to_list(Product_Questions)
++
++    df1 = pd.DataFrame({'Product_Profile': Product_Profile})
++    df2 = pd.DataFrame(tmp_2)
++    df3 = pd.DataFrame(tmp_3)
++
++    # Create a new excel workbook
++    writer = pd.ExcelWriter(_to_file, engine='xlsxwriter')
++
++    # Write each dataframe to a different worksheet.
++    df1.to_excel(writer, sheet_name='Product_Profile')
++    df2.to_excel(writer, sheet_name='Product_Reviews',index=False,header=False)
++    df3.to_excel(writer, sheet_name='Product_Questions',index=False,header=False)
++
++
++    writer.save()
++
++    print(f'- saved all the data in {_to_file}')
+Index: ASINs/B07MW4BR8D.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[\r\n    [\r\n        {\r\n            \"Amazon Product Profile\": {\r\n                \"Product_ASIN\": \"B07MW4BR8D\",\r\n                \"Product_Title\": \"Stylus Pen for Touch Screens with Magnetic Charging Station Standby 30 Days 1.45mm Copper Tip Digital Pen Compatible with iPhone/iPad/Android/Samsung/Surface/Tablet/Smartphone for Drawing (Sliver)\",\r\n                \"Product_Price\": \"$27.99\",\r\n                \"Product_URL\": \"https://www.amazon.com/dp/B07MW4BR8D\",\r\n                \"Product_All_Reviews_URL\": \"https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews\",\r\n                \"Product_Positive_Reviews_URL\": \"https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=positive&pageNumber=1\",\r\n                \"Product_Critical_Reviews_URL\": \"https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=critical&pageNumber=1\",\r\n                \"Product_No_Of_Postivie_Reviewes\": \"8\",\r\n                \"Product_No_Of_Critical_Reviewes\": \"10\",\r\n                \"Product_Questions_URL\": \"https://www.amazon.com/ask/questions/asin/B07MW4BR8D/\"\r\n            }\r\n        },\r\n        {\r\n            \"Amazon Product Reviews\": [\r\n                {\r\n                    \"Reviewer_Name\": \"Gabby Anderson\",\r\n                    \"Review_Title\": \"Excellent Multi-use Universal Stylus Pen!!\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"15-06-2019\",\r\n                    \"Review_Text\": \"Your browser does not support HTML5 video.\\n\\n\\n   I have 2 tablet,  It works with every touch screen I have such as my surface and ipad in video, So far I think this one is the best stylus I've ever purchased. Highly recommend. The fine tip works great on tablet screens and fine detail. It come with a micro-usb charging cord,  the pen top is magnetically attached over charging port. The price is reasonable compared to other stylus.Great Stylus, Perfect For Tablets, you can have a try.\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Kevin Fisher\",\r\n                    \"Review_Title\": \"Accurate, holds charge!\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"21-04-2019\",\r\n                    \"Review_Text\": \"Wow, love this. I had a stylus that was similar but cheaper, it had replaceable tips, but this is sleeker, holds charge longer, and it’s more accurate. The tip is tiny and doesn’t need to be replaced. Super accurate and I love the color. I use it on my first generation iPad and I’m really happy I bought this stylus instead of a cheaper (cheaper made) one. Totally worth it.\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"DuxDiva\",\r\n                    \"Review_Title\": \"My new favorite appendage.\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"04-01-2020\",\r\n                    \"Review_Text\": \"Great product. Nice weight, beautiful color (blue), click top, magnetic charger, everything about it is wonderful. Is great on my iPhone, amazing on iPad Pro, and was surprised that it worked on 3 of our 5 kindle fires (not beautully responsive like on Apple screen, but didn’t expect it to work on them at all). Ordered a similar product right after this to get another color and was not nearly as impressed. Please make more colors!\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Joni\",\r\n                    \"Review_Title\": \"Love it so far\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"13-06-2020\",\r\n                    \"Review_Text\": \"I’ve only had this for a week. So I can’t vouch for its durability. But he works great with my iPad Mini 4. I’m using it mostly for my coloring games as some of the areas are so tiny that my finger would not be able to tap onto the space to fill it. I still have to zoom in some cause it won’t get to super tiny spots, but I think its accuracy is probably identical to that of higher priced pencils.It’s about the same weight of a “good pen” not like a bic pen. LOL! Which makes handling much nicer. Clicks on and off like a pen, and lasts a while if you turn it off between uses. It does not require pairing. Works right out of the box.\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Caden Fox\",\r\n                    \"Review_Title\": \"Excellent iPad and iPhone stylus pen\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"06-04-2020\",\r\n                    \"Review_Text\": \"Fantastic product, it’s easy to charge and compatible with both my Samsung S9 and my iPad.One thing to note is that the pen is quite sensitive, which might annoy some people but it’s great for anyone wanting to write or draw with this pen.This Stylus Pen has saved me a lot of time and effort.\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Jonathan\",\r\n                    \"Review_Title\": \"Finally a stylus that works great!\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"13-09-2019\",\r\n                    \"Review_Text\": \"This is by far the best stylus I've purchased to date. It works with virtually any touch screen and is very accurate. Writing with it is flawless and feels natural. The magnetic charging snaps into place and is the quickest charging I've experienced with any stylus I've own before. It last longer than others I've owned as well. The copper tip is way better than those rubber, disk, or mesh tipped ones and won't degrade or need replacement. Overall this stylus rocks and would highly recommend to anyone looking for a sturdy, well built, and long lasting stylus.\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Luc E.\",\r\n                    \"Review_Title\": \"Awsome pen and won’t scratch your screen\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"23-12-2020\",\r\n                    \"Review_Text\": \"I was a bit hesitant to get this as it said it was a brass or copper tip and was scared it would scratch my new computers screen. But I was wrong. It glides very smoothly, the pen came fully charged , is sleek, and very easy to hold , feels like I’m writing with a pen. I love how reactive it is to the touch screen, and how smooth is travels on the surface of the screen. Very glad I got this one. Also came  with a lifetime warranty wich is really handy to have. If I’m doubt..I would def get this pen. I use it for 3D design and sketching and love it .\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Logan Buckner\",\r\n                    \"Review_Title\": \"Lightweight and extremely accurate, with no pairing needed\",\r\n                    \"Review_Rating\": \"★★★★★\",\r\n                    \"Review_Date\": \"02-08-2019\",\r\n                    \"Review_Text\": \"One of the genius parts about it is that you can use it straight away; you dont have to pair it with Bluetooth, or download any apps, just charge it and youre good to go. A full charge only takes 60 minutes and then it lasts for ages, and it automatically powers down after 3 minutes to save the charge. I have a Huawei tablet, an iPhone, and a Samsung Galaxy S9 so to be able to use the stylus on each of these devices is incredible, and as Ive said before because no pairing in required, you can just move seamlessly from one to another. To charge it, you just install the magnetic cap and insert a micro USB cable, (which is included).\",\r\n                    \"Review_type\": \"Positive\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Jacqueline Smith\",\r\n                    \"Review_Title\": \"A puppy's paw would work better.\",\r\n                    \"Review_Rating\": \"★\",\r\n                    \"Review_Date\": \"27-02-2020\",\r\n                    \"Review_Text\": \"Your browser does not support HTML5 video.\\n\\n\\n   Hard tip. Scratches the screen. Trying to draw a straight line looks like Morse code with all the dots and dashes. Note taking is impossible. Delayed response. I had to tap the screen several times before it registered and opened an app or file or whatever. Awful awful awful. The only thing this pen did well was the look and feel. It feels like an actually pen. The clip is nice. You click the top of the pen to activate. The blue light that indicates it's on is nice. But then the pen is utterly useless. Useless. Useless. Utterly useless. I'm so disappointed because it looks so cool. Dang...\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Jimmy Phan\",\r\n                    \"Review_Title\": \"Decent\",\r\n                    \"Review_Rating\": \"★★★\",\r\n                    \"Review_Date\": \"14-04-2019\",\r\n                    \"Review_Text\": \"Your browser does not support HTML5 video.\\n\\n\\n   I bought this for my surface book 2 and surface pro 3 however the pen function will only work if I use the hand drawing option in ONENOTE. Mainly works like a left click than an actual writing pen, depending on the program you use.PROS:-I bought this pen because of the copper tip. I am praying it holds up better than the soft nib or the plastic hard nibs.-Magnetic charging and doesnt need batteries-looks good with LED-easy on/off buttonCons:- not magnetic on the sides therefore wont stick to the side of my surface. The only magnetic part is the clip and the top but the clip isnt strongly magnetized enough.- the USB wire it came with doesnt work- no eraser or right click button- sometimes lags when I'm trying to select stuff- there were some scratches on it when I got it\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Kwan L. Lowe\",\r\n                    \"Review_Title\": \"Works OK with Pixel\",\r\n                    \"Review_Rating\": \"★★★\",\r\n                    \"Review_Date\": \"23-09-2020\",\r\n                    \"Review_Text\": \"This sort of works with a Pixel 3XL phone. It registers and can make lines and such, but the tracking is pretty poor and not much better than the $4 stylus I'd used previously. By this I mean that lines are extremely jagged versus the smoother lines I get with a finger or the rubber-nibbed 10-pack pens I've been using.I also tried it on a Lenovo Duet and it was close to unusable. It's not listed as a compatible so not taking off any stars for that, but it is supposedly a USI compatible pen. On the Duet it's not usable. It registers lines and can click items but the tracking is so poor that it's better just to use a finger or a plastic stylus.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Across Bones Photography\",\r\n                    \"Review_Title\": \"WARNING: False Item Description, Do Not Buy\",\r\n                    \"Review_Rating\": \"★\",\r\n                    \"Review_Date\": \"05-06-2020\",\r\n                    \"Review_Text\": \"Mine doesn't include a detachable magnetic charging station like described and pictured in the listing. Instead, it's got a magnetic port on the end of a short USB cable which makes charging it a lot more inconvenient. It also means that if I ever lose this stupid one purpose cord, I'll be SoL after the battery dies and need a new stylus. The product works for now, not as well as the other off brand one it's replacing but it's serviceable. If it stops working or if anything weird sticks out, I'll update the review. But for now, if this is what the product is, don't buy it. Literally pick any other one. I wish I did.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Janusz Kowalczyk\",\r\n                    \"Review_Title\": \"Stops working 2-3 months like almost all my items from amazon.\",\r\n                    \"Review_Rating\": \"★\",\r\n                    \"Review_Date\": \"26-09-2019\",\r\n                    \"Review_Text\": \"I did like it when it actually worked for about 2 months like every other thing I get from amazon which this crap quality is from China and it’s sickening to have me buy things online and no joke, I don’t remember ordering something that has lasted me more than 4 months as what i’m being is crap as this stylus turns charged but doesn’t do anything on phone screens so if you need a stylus for two months this one is perfect for you.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Amy Lynne\",\r\n                    \"Review_Title\": \"Mediocre for notetaking, but definately NOT a drawing pen.\",\r\n                    \"Review_Rating\": \"★★★\",\r\n                    \"Review_Date\": \"01-07-2019\",\r\n                    \"Review_Text\": \"currently using with a Samsung Galaxy Tab s3.Written notes are messy and hard to read unless using the handwriting to text function of this tablet. Drawing is little more than drawing with a finger. No pressure sensitivity, and will not allow perm mode.Used with squid app the only ledgable is the handwritten notes to text.  Overall it does work, but not as described.Will be kept as a back up in case my better option bites the dust, but for half the price, that one has pressure sensitivity and it's easier to control. I wouldn't buy this pen again,but ya live and learn I suppose.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"PianoMan\",\r\n                    \"Review_Title\": \"Eh..50/50\",\r\n                    \"Review_Rating\": \"★★\",\r\n                    \"Review_Date\": \"14-10-2020\",\r\n                    \"Review_Text\": \"About 1 in 5 times it simply doesn't work for no apparent reason. Other than that,I like everything else about the device;The design of the stylus, charging method, functionality, aesthetics, and duration of charge vs time to recharge. I have owned my fair share of digital pens/stylus's, and I generally prefer this one to others.Update 10/01/20Dropped it one time on the linoleum.. Completely broken. \uD83D\uDE44\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Thomas\",\r\n                    \"Review_Title\": \"Looks cool... performs less than desirable\",\r\n                    \"Review_Rating\": \"★★\",\r\n                    \"Review_Date\": \"19-12-2020\",\r\n                    \"Review_Text\": \"Pen looks amazing, and having it with a quick disconnect charger is awesome... just sucks that it is hardly accurate even compared to cheaper stylus’ that you can get for a fraction of the price.  I attempted to use it on an iPhone and a google chrome book, both of which I’d used other pens on that worked fine... I was just enamored by the charging set up for this one and despite how cool it seems, I hardly ever use it thanks to its inability to actually draw or write accurately with my movements.  If you are looking for one just save your money and go with a cheaper one that works.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"Clifton L. Smith\",\r\n                    \"Review_Title\": \"It does not work.\",\r\n                    \"Review_Rating\": \"★\",\r\n                    \"Review_Date\": \"27-12-2019\",\r\n                    \"Review_Text\": \"It doesn't work. I have a Windows 10 2 in 1 PC tablet combo and this thing just skips around on the screen. I don't even have a screen protector installed. I am sending it back.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Reviewer_Name\": \"D. Paquette\",\r\n                    \"Review_Title\": \"Does not work with windows in my experience\",\r\n                    \"Review_Rating\": \"★★★\",\r\n                    \"Review_Date\": \"07-01-2020\",\r\n                    \"Review_Text\": \"Unfortunately not as described. The \\\"if your finger works, this pen works\\\" is not true. Will not work on my windows capacitive touch screen monitors. Does work on my Chromebook and Android phone, but then again so does the regular stylus for a lot less money. So, while I wanted to LOVE it, I will be returning it as it's claims of working with Windows is unfounded in my experience with three different desktop touch screens.\",\r\n                    \"Review_type\": \"Critical\",\r\n                    \"Review_ASIN_\": \"B07MW4BR8D\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"Amazon Product Questions\": [\r\n                {\r\n                    \"Question_\": \"Given that this pen uses a rubber nib at the tip and doesn't connect wirelessly to your device, why does the pen need to be charged?\",\r\n                    \"Answer_\": \"dear, it do not any connect, you just touch your iphone or ipad ,it can work.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"How is the quality of it?\",\r\n                    \"Answer_\": \"Good quality. But the tip is copper. It may scratch the screen over time if you do not have a screen protector.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Will this work for my touch screen HP notebook laptop?\",\r\n                    \"Answer_\": \"Ive used this on my ipad, note 8 and touch screen windows 10 laptop with no problem\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"does this support windows right-click?\",\r\n                    \"Answer_\": \"The pen acts the same as your finger, where “left click“ is a tap and “right click” is accessed by long-pressing the pen (or finger) and the menu pops up.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"does this work with the hp chromebook x360 14b?\",\r\n                    \"Answer_\": \"If it is touchscreen, yes.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Will this stylus work with the nintendo switch? with games like super mario maker and the level editor for ssbu, it would be nice to have a stylus.\",\r\n                    \"Answer_\": \"dear, this pen only as a stylus pen, it do not need any connection, as long as your figer can work, this pen can work for your devices.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Will it scratch my screen?\",\r\n                    \"Answer_\": \"Over time yes if you do not have a screen protector. The tips is copper.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Is it good for mate 20 pro?\",\r\n                    \"Answer_\": \"dear, as long as you rfinger can work for your phone, our stylus pen can work\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Is there a warranty on the heiyo stylus pen with magnetic charging station, 30-day standby & 10 hrs using time rechargeable capacitive digital pen com\",\r\n                    \"Answer_\": \"don’t know about warranties - always best to directly ask mfg. because that info can change.\\nI do know it is a really nice stylus for the price.\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                },\r\n                {\r\n                    \"Question_\": \"Will this stylus pen work with the samsung galaxy tab 3 (9.7)?\",\r\n                    \"Answer_\": \"Dear,\\nThis iPad pen is designed for iPad series, but we haven't test it on Samsung Galaxy series.\\nif you have any question, you can contact with our service team\",\r\n                    \"Question_ASIN_\": \"B07MW4BR8D\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n]
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ASINs/B07MW4BR8D.json b/ASINs/B07MW4BR8D.json
+--- a/ASINs/B07MW4BR8D.json	(revision e968cd92184dd009f73f2ac4089dceefc1ab4454)
++++ b/ASINs/B07MW4BR8D.json	(date 1615233195978)
+@@ -9,7 +9,7 @@
+                 "Product_All_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews",
+                 "Product_Positive_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=positive&pageNumber=1",
+                 "Product_Critical_Reviews_URL": "https://www.amazon.com/Heiyo-Magnetic-Rechargeable-Capacitive-Compatible/product-reviews/B07MW4BR8D/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&filterByStar=critical&pageNumber=1",
+-                "Product_No_Of_Postivie_Reviewes": "8",
++                "Product_No_Of_Postivie_Reviewes": "16",
+                 "Product_No_Of_Critical_Reviewes": "10",
+                 "Product_Questions_URL": "https://www.amazon.com/ask/questions/asin/B07MW4BR8D/"
+             }
+@@ -17,6 +17,78 @@
+         {
+             "Amazon Product Reviews": [
+                 {
++                    "Reviewer_Name": "Gabby Anderson",
++                    "Review_Title": "Excellent Multi-use Universal Stylus Pen!!",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "15-06-2019",
++                    "Review_Text": "Your browser does not support HTML5 video.\n\n\n   I have 2 tablet,  It works with every touch screen I have such as my surface and ipad in video, So far I think this one is the best stylus I've ever purchased. Highly recommend. The fine tip works great on tablet screens and fine detail. It come with a micro-usb charging cord,  the pen top is magnetically attached over charging port. The price is reasonable compared to other stylus.Great Stylus, Perfect For Tablets, you can have a try.",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Kevin Fisher",
++                    "Review_Title": "Accurate, holds charge!",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "21-04-2019",
++                    "Review_Text": "Wow, love this. I had a stylus that was similar but cheaper, it had replaceable tips, but this is sleeker, holds charge longer, and it’s more accurate. The tip is tiny and doesn’t need to be replaced. Super accurate and I love the color. I use it on my first generation iPad and I’m really happy I bought this stylus instead of a cheaper (cheaper made) one. Totally worth it.",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "DuxDiva",
++                    "Review_Title": "My new favorite appendage.",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "04-01-2020",
++                    "Review_Text": "Great product. Nice weight, beautiful color (blue), click top, magnetic charger, everything about it is wonderful. Is great on my iPhone, amazing on iPad Pro, and was surprised that it worked on 3 of our 5 kindle fires (not beautully responsive like on Apple screen, but didn’t expect it to work on them at all). Ordered a similar product right after this to get another color and was not nearly as impressed. Please make more colors!",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Joni",
++                    "Review_Title": "Love it so far",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "13-06-2020",
++                    "Review_Text": "I’ve only had this for a week. So I can’t vouch for its durability. But he works great with my iPad Mini 4. I’m using it mostly for my coloring games as some of the areas are so tiny that my finger would not be able to tap onto the space to fill it. I still have to zoom in some cause it won’t get to super tiny spots, but I think its accuracy is probably identical to that of higher priced pencils.It’s about the same weight of a “good pen” not like a bic pen. LOL! Which makes handling much nicer. Clicks on and off like a pen, and lasts a while if you turn it off between uses. It does not require pairing. Works right out of the box.",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Caden Fox",
++                    "Review_Title": "Excellent iPad and iPhone stylus pen",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "06-04-2020",
++                    "Review_Text": "Fantastic product, it’s easy to charge and compatible with both my Samsung S9 and my iPad.One thing to note is that the pen is quite sensitive, which might annoy some people but it’s great for anyone wanting to write or draw with this pen.This Stylus Pen has saved me a lot of time and effort.",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Jonathan",
++                    "Review_Title": "Finally a stylus that works great!",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "13-09-2019",
++                    "Review_Text": "This is by far the best stylus I've purchased to date. It works with virtually any touch screen and is very accurate. Writing with it is flawless and feels natural. The magnetic charging snaps into place and is the quickest charging I've experienced with any stylus I've own before. It last longer than others I've owned as well. The copper tip is way better than those rubber, disk, or mesh tipped ones and won't degrade or need replacement. Overall this stylus rocks and would highly recommend to anyone looking for a sturdy, well built, and long lasting stylus.",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Luc E.",
++                    "Review_Title": "Awsome pen and won’t scratch your screen",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "23-12-2020",
++                    "Review_Text": "I was a bit hesitant to get this as it said it was a brass or copper tip and was scared it would scratch my new computers screen. But I was wrong. It glides very smoothly, the pen came fully charged , is sleek, and very easy to hold , feels like I’m writing with a pen. I love how reactive it is to the touch screen, and how smooth is travels on the surface of the screen. Very glad I got this one. Also came  with a lifetime warranty wich is really handy to have. If I’m doubt..I would def get this pen. I use it for 3D design and sketching and love it .",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
++                    "Reviewer_Name": "Logan Buckner",
++                    "Review_Title": "Lightweight and extremely accurate, with no pairing needed",
++                    "Review_Rating": "★★★★★",
++                    "Review_Date": "02-08-2019",
++                    "Review_Text": "One of the genius parts about it is that you can use it straight away; you dont have to pair it with Bluetooth, or download any apps, just charge it and youre good to go. A full charge only takes 60 minutes and then it lasts for ages, and it automatically powers down after 3 minutes to save the charge. I have a Huawei tablet, an iPhone, and a Samsung Galaxy S9 so to be able to use the stylus on each of these devices is incredible, and as Ive said before because no pairing in required, you can just move seamlessly from one to another. To charge it, you just install the magnetic cap and insert a micro USB cable, (which is included).",
++                    "Review_type": "Positive",
++                    "Review_ASIN_": "B07MW4BR8D"
++                },
++                {
+                     "Reviewer_Name": "Gabby Anderson",
+                     "Review_Title": "Excellent Multi-use Universal Stylus Pen!!",
+                     "Review_Rating": "★★★★★",
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Amazon-Products\r\n=============================\r\n\r\ntake Amazon Product ASIN and retrieve , Product Profile , Reviews and Questions\r\nIntroduction:\r\n\r\nthis project takes Amazon Product ASIN ( something like Product reference for Amazon),\r\n\r\nand get all details about the product Reviews and Questions about it from the customers\r\n\r\nAmazon_Asin_V1.0.py:\r\n=============================\r\n\r\nI could read all the product reviews ( Positive and Critical ) ones, using selenium\r\n\r\nI created Review Items\r\n\r\nI created Product Items\r\n\r\n=============================\r\n\r\nAmazon_Asin_V1.2.py\r\n=============================\r\n\r\nI will use direct links extracted rather than extracting them using selenim actions, for Positive and Critical Reviews\r\n\r\n=============================\r\n\r\nAmazon_Asin_V1.4.py\r\n=============================\r\n\r\nI fixed the json format output by adding .dict for each object before appending to the Data_ variable that will be used later to output the json file.\r\n\r\n=============================\r\n\r\nAmazon_Asin_V1.5.py\r\n=============================\r\n\r\nI could from main page extract all links for Reviews pag , and Question page ( actually it is a fixed URL for questions)\r\n\r\nthen use these links to go for each page and fetch the data for each scope\r\n\r\nrather than doing automation form main page to get the links then click on them, I think this faster !!\r\n\r\nI work now on fetching questions !!.............. Done\r\n\r\n=============================\r\n\r\nAmazon_Asin_V1.6.py\r\n=============================\r\n\r\nI will enhance the code and remove un-necessary lines\r\nin in Amazon_Asin_V1.7.py\r\n\r\n=============================\r\n\r\n\r\nAmazon_Asin_V1.7.py\r\n=============================\r\ncreated class for Amzon Function to be called from Amazon_Asin_V1.7.py\r\n\r\n=============================\r\n\r\n\r\nAmazon_Asin_V1.8.py\r\n=============================\r\n\r\ncreated class for Amzon FunctionV3 to be called from Amazon_Asin_V1.8.py\r\n\r\nupdated finding elements as per Amazon updates\r\n\r\n=============================\r\n\r\n\r\nAmazon_Asin_V1.9.py\r\n=============================\r\n\r\ncreated class for Amzon FunctionV4 to be called from Amazon_Asin_V1.9.py\r\n\r\nAdded Product Price in Amazon Product Class \"Amazon_Product.py\"\r\n\r\nAdded command line to get ASIN number as an input form the command line\r\n\r\nAdded ASIN availability checker\r\n\r\n=============================\r\n\r\n\r\nAmazon_Asin_V2.0.py\r\n=============================\r\n\r\nCreated class for Amzon FunctionV5 to be called from Amazon_Asin_V2.0.py\r\n\r\nAdded comman line parameters as below:\r\n\r\nAdded Parameter to Enter ASIN inthe command line, example -a B07MW4BR8D\r\n\r\nAdded Parameter to specify number of customers' Reviews pages to collect (option), example:  -r 3\r\n\r\nAdded Parameter to specify number of customers' Questions pages to collect (option), example:  -q 3\r\n\r\nAdded Parameter to hide the Browser or display it while fetching the data, example:  -v 1  (to display the Browser) , -v 0 (to hide the Browser)\r\n\r\nno need to put parameters in order !!\r\n\r\nExample: python Amazon_Asin_V2.0.py -q 2 -r 2 -a B07MW4BR8D -v 1\r\nin this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D\r\nand the Brwoser will be invisible\r\n\r\nusage: Amazon_Asin_V2.0.py [-h] -a ASIN [-r REVIEWSCOUNT] [-q QUESTIONSCOUNT] [-v HIDEBROWSER]\r\n\r\nto get Amazon Product Data, Reviews and Question\r\n\r\noptional arguments:\r\n\r\n  -h, --help            show this help message and exit\r\n\r\n  -a ASIN, --ASIN ASIN  Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter\r\n\r\n  -r REVIEWSCOUNT, --ReviewsCount REVIEWSCOUNT\r\n\r\n\tPlease enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews\r\n\r\n  -q QUESTIONSCOUNT, --QuestionsCount QUESTIONSCOUNT\r\n\r\n\tPlease enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions\r\n\r\n  -v HIDEBROWSER, --HideBrowser HIDEBROWSER\r\n\r\n\tto Hide the Browser, \"0\" means to Hide , while \"1\" means to display it, Optional Parameter ,if not set, the Browser will be invisibile\r\n\r\n\r\n\r\n=============================\r\n\r\n\r\nAmazon_Asin_V2.1.py\r\n=============================\r\n\r\nworking on Adding option to output the data in csv formart\r\n\r\n=============================\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision e968cd92184dd009f73f2ac4089dceefc1ab4454)
++++ b/README.md	(date 1615234548461)
+@@ -137,6 +137,6 @@
+ Amazon_Asin_V2.1.py
+ =============================
+ 
+-working on Adding option to output the data in csv formart
++Added the option to output the data in xlsx format as default and json as optional outcome if specified in the command line as -json 1
+ 
+ =============================
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+--- /dev/null	(date 1615235231362)
++++ b/.gitignore	(date 1615235231362)
+@@ -0,0 +1,1 @@
++/dist/
+Index: test.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\n\r\nimport json\r\n\r\n\r\ndef _read_from_file(fname):\r\n    try:\r\n        # to load json file without errors or exception , I added encoding='utf-8'\r\n        with open(fname, 'r',encoding='utf-8') as infile:\r\n            res = infile.read()\r\n            # return json.loads(res)\r\n            return res\r\n    except Exception as ex_:\r\n        print(ex_)\r\n        return {}\r\n\r\ndef _write_to_file(fname, _data):\r\n    try:\r\n        with open(fname, 'w',encoding='utf-8') as out_file:\r\n            out_file.write(_data)\r\n            out_file.close()\r\n    except:\r\n        print('could not save this file')\r\n\r\n\r\n\r\n# data_ = json.loads(_read_from_file(r'.\\ASINs\\B07MW4BR8D.json'))\r\n\r\nimport argparse\r\nimport sys\r\n\r\n\r\nparser = argparse.ArgumentParser()\r\nparser.add_argument('-d', '--days', required=True,  help=\"Check mapped inventory that is x days old\", default=None)\r\nparser.add_argument('-e', '--event', required=False, action=\"store\", dest=\"event_id\",\r\n                    help=\"Check mapped inventory for a specific event\", default=None)\r\nparser.add_argument('-b', '--broker', required=False, action=\"store\", dest=\"broker_id\",\r\n                    help=\"Check mapped inventory for a broker\", default=None)\r\nparser.add_argument('-k', '--keyword', required=False, action=\"store\", dest=\"event_keyword\",\r\n                    help=\"Check mapped inventory for a specific event keyword\", default=None)\r\nparser.add_argument('-p', '--product', required=False, action=\"store\", dest=\"product_id\",\r\n                    help=\"Check mapped inventory for a specific product\", default=None)\r\nparser.add_argument('-m', '--metadata', required=False, action=\"store\", dest=\"metadata\",\r\n                    help=\"Check mapped inventory for specific metadata, good for debugging past tix\", default=None)\r\nparser.add_argument('-u', '--update', required=False, action=\"store_true\", dest=\"make_updates\",\r\n                    help=\"Update the event for a product if there is a difference, default No\", default=False)\r\nargs = parser.parse_args()\r\n\r\ndays = args.days\r\nevent_id = args.event_id\r\nbroker_id = args.broker_id\r\nevent_keyword = args.event_keyword\r\nproduct_id = args.product_id\r\nmetadata = args.metadata\r\nmake_updates = args.make_updates\r\n\r\nno_change_counter = 0\r\nchange_counter = 0\r\n\r\nreq_arg = bool(days) + bool(event_id) + bool(broker_id) + bool(product_id) + bool(event_keyword) + bool(metadata)\r\nif not req_arg:\r\n    print(\"Need to specify days, broker id, event id, event keyword or past tickets full metadata\")\r\n    parser.print_help()\r\n    sys.exit()\r\nelif req_arg != 1:\r\n    print(\"More than one option specified. Need to specify only one required option\")\r\n    parser.print_help()\r\n    sys.exit()\r\n\r\n\r\n\r\nprint('Hi')\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/test.py b/test.py
+--- a/test.py	(revision e968cd92184dd009f73f2ac4089dceefc1ab4454)
++++ b/test.py	(date 1615171779892)
+@@ -1,7 +1,10 @@
+ 
+ 
+ import json
+-
++import argparse
++import sys
++import pandas as pd
++from AmazonFunctionsV5 import _Json_to_CSV_Questions, _Json_to_CSV_Reviews
+ 
+ def _read_from_file(fname):
+     try:
+@@ -24,49 +27,94 @@
+ 
+ 
+ 
+-# data_ = json.loads(_read_from_file(r'.\ASINs\B07MW4BR8D.json'))
++def _dicts_to_list(_dicts_list):
++
++    _tmp_list = []
++    # add columns as a first list
++    _tmp_list.append(list(_dicts_list[0].keys()))
+ 
+-import argparse
+-import sys
++    for _dict in _dicts_list:
++        _tmp_list.append(list(_dict.values()))
+ 
++    return _tmp_list
++
++def initiateArguments():
+ 
+-parser = argparse.ArgumentParser()
+-parser.add_argument('-d', '--days', required=True,  help="Check mapped inventory that is x days old", default=None)
+-parser.add_argument('-e', '--event', required=False, action="store", dest="event_id",
+-                    help="Check mapped inventory for a specific event", default=None)
+-parser.add_argument('-b', '--broker', required=False, action="store", dest="broker_id",
+-                    help="Check mapped inventory for a broker", default=None)
+-parser.add_argument('-k', '--keyword', required=False, action="store", dest="event_keyword",
+-                    help="Check mapped inventory for a specific event keyword", default=None)
+-parser.add_argument('-p', '--product', required=False, action="store", dest="product_id",
+-                    help="Check mapped inventory for a specific product", default=None)
+-parser.add_argument('-m', '--metadata', required=False, action="store", dest="metadata",
+-                    help="Check mapped inventory for specific metadata, good for debugging past tix", default=None)
+-parser.add_argument('-u', '--update', required=False, action="store_true", dest="make_updates",
+-                    help="Update the event for a product if there is a difference, default No", default=False)
+-args = parser.parse_args()
++    parser = argparse.ArgumentParser()
++    parser.add_argument('-d', '--days', required=True,  help="Check mapped inventory that is x days old", default=None)
++    parser.add_argument('-e', '--event', required=False, action="store", dest="event_id",
++                        help="Check mapped inventory for a specific event", default=None)
++    parser.add_argument('-b', '--broker', required=False, action="store", dest="broker_id",
++                        help="Check mapped inventory for a broker", default=None)
++    parser.add_argument('-k', '--keyword', required=False, action="store", dest="event_keyword",
++                        help="Check mapped inventory for a specific event keyword", default=None)
++    parser.add_argument('-p', '--product', required=False, action="store", dest="product_id",
++                        help="Check mapped inventory for a specific product", default=None)
++    parser.add_argument('-m', '--metadata', required=False, action="store", dest="metadata",
++                        help="Check mapped inventory for specific metadata, good for debugging past tix", default=None)
++    parser.add_argument('-u', '--update', required=False, action="store_true", dest="make_updates",
++                        help="Update the event for a product if there is a difference, default No", default=False)
++    args = parser.parse_args()
+ 
+-days = args.days
+-event_id = args.event_id
+-broker_id = args.broker_id
+-event_keyword = args.event_keyword
+-product_id = args.product_id
+-metadata = args.metadata
+-make_updates = args.make_updates
++    days = args.days
++    event_id = args.event_id
++    broker_id = args.broker_id
++    event_keyword = args.event_keyword
++    product_id = args.product_id
++    metadata = args.metadata
++    make_updates = args.make_updates
+ 
+-no_change_counter = 0
+-change_counter = 0
++    no_change_counter = 0
++    change_counter = 0
+ 
+-req_arg = bool(days) + bool(event_id) + bool(broker_id) + bool(product_id) + bool(event_keyword) + bool(metadata)
+-if not req_arg:
+-    print("Need to specify days, broker id, event id, event keyword or past tickets full metadata")
+-    parser.print_help()
+-    sys.exit()
+-elif req_arg != 1:
+-    print("More than one option specified. Need to specify only one required option")
+-    parser.print_help()
+-    sys.exit()
++    req_arg = bool(days) + bool(event_id) + bool(broker_id) + bool(product_id) + bool(event_keyword) + bool(metadata)
++    if not req_arg:
++        print("Need to specify days, broker id, event id, event keyword or past tickets full metadata")
++        parser.print_help()
++        sys.exit()
++    elif req_arg != 1:
++        print("More than one option specified. Need to specify only one required option")
++        parser.print_help()
++        sys.exit()
+ 
+ 
+ 
+-print('Hi')
++data_ = json.loads(_read_from_file(r'.\ASINs\B07MW4BR8D.json'))
++
++
++Product_Profile = {}
++Product_Reviews = {}
++Product_Questions = {}
++
++Product_Profile = data_[0][0]['Amazon Product Profile']
++Product_Reviews = data_[0][1]['Amazon Product Reviews']
++Product_Questions = data_[0][2]['Amazon Product Questions']
++# Add your data in list, which may contain a dictionary with the name of the
++# columns as the key
++# df1 = pd.DataFrame({'Product_Profile': Product_Profile})
++df1 = pd.DataFrame({'Product_Profile': Product_Profile})
++# df2 = pd.DataFrame({'Product_Reviews': Product_Reviews[0]})
++df2 = pd.DataFrame({'Product_Reviews': Product_Reviews[0]})
++# df3 = pd.DataFrame({'Product_Questions': Product_Questions})
++df3 = pd.DataFrame({'Product_Questions': Product_Questions})
++
++
++tmp_2 = _dicts_to_list(Product_Reviews)
++tmp_3 = _dicts_to_list(Product_Questions)
++
++df4 = pd.DataFrame(tmp_2)
++df5 = pd.DataFrame(tmp_3)
++
++# Create a new excel workbook
++writer = pd.ExcelWriter('Product.xlsx', engine='xlsxwriter')
++
++# Write each dataframe to a different worksheet.
++df1.to_excel(writer, sheet_name='Product_Profile')
++df4.to_excel(writer, sheet_name='Product_Reviews',index=False,header=False)
++df5.to_excel(writer, sheet_name='Product_Questions',index=False,header=False)
++
++print(df4)
++# _Json_to_CSV_Questions(Product_Questions)
++# _Json_to_CSV_Reviews(Product_Reviews)
++writer.save()
++print('Hi')
+\ No newline at end of file
