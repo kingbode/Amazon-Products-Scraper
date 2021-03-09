@@ -4,7 +4,7 @@ import json
 import argparse
 import sys
 import pandas as pd
-from AmazonFunctionsV5 import _Json_to_CSV_Questions, _Json_to_CSV_Reviews
+
 
 def _read_from_file(fname):
     try:

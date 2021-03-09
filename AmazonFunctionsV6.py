@@ -1,4 +1,3 @@
-import csv
 
 import datefinder
 import requests
@@ -191,7 +190,11 @@ def get_Product_Profile(driver_,ASIN_):
         # ===========================================================================
         soup_Main = BeautifulSoup(amazon_page_ ,"html.parser")
         Product_Title = soup_Main.find('span' , {'id':'productTitle'}).text.rstrip().lstrip()
-        Product_Price = soup_Main.find('span' , {'id':'priceblock_ourprice'}).text.rstrip().lstrip()
+        try:
+            Product_Price = soup_Main.find('span' , {'id':'priceblock_ourprice'}).text.rstrip().lstrip()
+        except:
+            Product_Price = 'None << means not available'
+
         print('- got Product Title Successfully')
 
         # ===========================================================================
@@ -769,74 +772,10 @@ def check_P_I(_number):
     except:
         return False
 
-#=======================================================
-
-
-""" _Json_to_CSV_   : Takes input argment ( JSON file and convert it o CSV file in same folder with same name but with csv extension """
-def _Json_to_CSV_Reviews(_data2):
-
-    ofilename = '_Reviews_tmp.csv'
-
-    ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
-    # ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
-
-    fields = list(_data2[0])
-
-    writer = csv.DictWriter(ofile, fieldnames=fields)
-
-    headers = {'Reviewer_Name': 'Reviewer Name',
-                         'Review_Title': 'Review Title',
-                         'Review_Rating': 'Review Rating',
-                         'Review_Date': 'Review Date',
-                         'Review_Text': 'Review Text',
-                         'Review_type': 'Review type',
-                         'Review_ASIN_': 'Review ASIN_'}
-
-    writer.writerow(headers)
-
-    for row in _data2:
-        writer.writerow(row['Reviewer_Name'].encode('Cp1250').decode('Cp1250').strip())
-
-    # csv_file = csv.writer(ofile)
-    # csv_file.writerow(
-    #     ["ASIN", "Reviewer_Name","Date", "Rating", "Review_Title", "Review_Text",  "Review_type" ])
-    # for i in range(0, len(_data) - 1):
-    #
-    #
-    #     csv_file.writerow([_data[i]['Review_ASIN_'],
-    #                        _data[i]['Reviewer_Name'].encode('utf-8').decode('utf-8').strip(),
-    #                        _data[i]['Review_Date'].encode('utf-8').decode('utf-8').strip(),
-    #                        len(_data[i]['Review_Rating'])*'★'.encode('utf-8').decode('utf-8').strip(),
-    #
-    #                        _data[i]['Review_Title'].encode('utf-8').decode('utf-8').strip(),
-    #                        _data[i]['Review_Text'].encode('utf-8').decode('utf-8').strip(),
-    #                        _data[i]['Review_type'].encode('utf-8').decode('utf-8').strip()])
-
-    ofile.close()
 
 #=======================================================
-def _Json_to_CSV_Questions(_data):
-
-    ofilename = '_Questions_tmp.csv'
-
-    ofile = open(ofilename, 'w', encoding='Cp1250', newline='')  # newline='' removes empty rows
-
-    fields = list(_data[0])
-
-    writer = csv.DictWriter(ofile, fieldnames=fields)
-
-    writer.writerow({'Question_':'Question','Answer_':'Answer','Question_ASIN_':'ASIN'})
-
-    for row in _data:
-        writer.writerow(row)
-
-  # luv u dad
 
 
-    ofile.close()
-
-
-#=======================================================
 def _dicts_to_list(_dicts_list):
 
     _tmp_list = []
@@ -851,7 +790,7 @@ def _dicts_to_list(_dicts_list):
 
 #=======================================================
 
-def _save_Data_to_XLSX(_to_file,_Amazon_Product_Data):
+def _save_Data_to_XLSX(_to_file,_Amazon_Product_Data,args):
 
 
     Product_Profile = {}
@@ -859,26 +798,29 @@ def _save_Data_to_XLSX(_to_file,_Amazon_Product_Data):
     Product_Questions = {}
 
     Product_Profile = _Amazon_Product_Data[0]['Amazon Product Profile']
-    Product_Reviews = _Amazon_Product_Data[1]['Amazon Product Reviews']
-    Product_Questions = _Amazon_Product_Data[2]['Amazon Product Questions']
-    # Add your data in list, which may contain a dictionary with the name of the
-    # columns as the keys
-    # df1 = pd.DataFrame({'Product_Profile': Product_Profile})
-
-    tmp_2 = _dicts_to_list(Product_Reviews)
-    tmp_3 = _dicts_to_list(Product_Questions)
-
     df1 = pd.DataFrame({'Product_Profile': Product_Profile})
-    df2 = pd.DataFrame(tmp_2)
-    df3 = pd.DataFrame(tmp_3)
 
     # Create a new excel workbook
     writer = pd.ExcelWriter(_to_file, engine='xlsxwriter')
 
     # Write each dataframe to a different worksheet.
     df1.to_excel(writer, sheet_name='Product_Profile')
-    df2.to_excel(writer, sheet_name='Product_Reviews',index=False,header=False)
-    df3.to_excel(writer, sheet_name='Product_Questions',index=False,header=False)
+
+    if(args.Selection == 1 or args.Selection ==None):
+        Product_Reviews = _Amazon_Product_Data[1]['Amazon Product Reviews']
+        tmp_2 = _dicts_to_list(Product_Reviews)
+        df2 = pd.DataFrame(tmp_2)
+        df2.to_excel(writer, sheet_name='Product_Reviews', index=False, header=False)
+
+    if(args.Selection == 2 or args.Selection ==None):
+        Product_Questions = _Amazon_Product_Data[2]['Amazon Product Questions']
+        tmp_3 = _dicts_to_list(Product_Questions)
+        df3 = pd.DataFrame(tmp_3)
+        df3.to_excel(writer, sheet_name='Product_Questions', index=False, header=False)
+    # Add your data in list, which may contain a dictionary with the name of the
+    # columns as the keys
+    # df1 = pd.DataFrame({'Product_Profile': Product_Profile})
+
 
 
     writer.save()

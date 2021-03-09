@@ -1,4 +1,4 @@
-from AmazonFunctionsV5 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
+from AmazonFunctionsV6 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
     check_P_I, _save_Data_to_XLSX
 
@@ -25,6 +25,7 @@ parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Pleas
 parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
 parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
 parser.add_argument('-json', '--json',required=False, type=int,help='to output the data in JSON format', default=None)
+parser.add_argument('-s', '--Selection',required=False, type=int,help='to select what to output , -s 1 for Reviews only, while -s 2 for Questionsthe only', default=None)
 
 
 
@@ -37,9 +38,10 @@ try:
 except:
     # here , it means no arguments were entered, so display the Help and exit !!
     print('===================================================================')
-    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1')
+    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 0 -s 2')
     print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')
-    print('and the Browser will be invisible')
+    print('also in this Example, we chose to output Questions Only and ignore Reviews')
+    print('and the Browser will be invisible, as ignoring -v as default will make Browser invisible')
     print('\nand no need to put parameters in order !!')
     print('===================================================================')
     parser.print_help()
@@ -70,6 +72,11 @@ if(check_P_I(args.ReviewsCount)):
 else:
     Reviews_limit = None
 
+if(check_P_I(args.Selection)):
+    Output_Selection = args.Selection
+else:
+    Output_Selection = None
+
 if(check_P_I(args.QuestionsCount)):
     Question_limit = args.QuestionsCount
 else:
@@ -86,6 +93,8 @@ else:
 
 if(check_P_I(args.json)):
     _to_JSON = bool(args.json)
+else:
+    _to_JSON = None
 
 
 
@@ -174,42 +183,43 @@ if _ASIN_Validity:
     # 5- Loading the Page of All Reviews of the Product !!!
     #===========================================================================
 
-    Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
+    if(Output_Selection == 1):
+        Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
 
-    #===========================================================================
-    # Saving All Reviews details about the Product in Amazon_Product_Data !!!
-    #===========================================================================
+        #===========================================================================
+        # Saving All Reviews details about the Product in Amazon_Product_Data !!!
+        #===========================================================================
 
-    Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
-    #===========================================================================
+        Amazon_Product_Data.append({'Amazon Product Reviews':Reviews_List})
+        #===========================================================================
 
     #===========================================================================
     # 6- Loading the Page of All Questions about the Product !!!
     #===========================================================================
+    if(Output_Selection == 2):
+        Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
 
-    Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
+        #==============================================================================
 
-    #==============================================================================
+        #===========================================================================
+        # Saving All Questions details about the Product in Amazon_Product_Data !!!
+        #===========================================================================
 
-    #===========================================================================
-    # Saving All Questions details about the Product in Amazon_Product_Data !!!
-    #===========================================================================
+        Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
 
-    Amazon_Product_Data.append({'Amazon Product Questions':Questions_List})
-
-    #===========================================================================
+        #===========================================================================
 
     #===========================================================================
     # output the data as json file
     #===========================================================================
-    if(_to_JSON):
+    if(_to_JSON != None):
         _save_Data_to_JSON('.\ASINs\\' + ASIN_+ '.json', Amazon_Product_Data)
 
     # ===========================================================================
     # output the data as XLSX file
     # ===========================================================================
     if (Amazon_Product_Data):
-        _save_Data_to_XLSX('.\ASINs\\' + ASIN_ + '.xlsx', Amazon_Product_Data)
+        _save_Data_to_XLSX('.\ASINs\\' + ASIN_ + '.xlsx', Amazon_Product_Data, args)
 
     # ===========================================================================
     # here we get how much time is taken to execute this process
