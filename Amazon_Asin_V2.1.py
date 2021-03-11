@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='to get Amazon Product Data, Review
 parser.add_argument('-a', '--ASIN', required=True, type=str,help='Please enter Amazon ASIN number, -a B07MW4BR8D , Required Parameter', default=None)
 parser.add_argument('-r', '--ReviewsCount', required=False, type=int,help='Please enter number of Reviews Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Reviews', default=None)
 parser.add_argument('-q', '--QuestionsCount',required=False, type=int,help='Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions', default=None)
-parser.add_argument('-v', '--HideBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
+parser.add_argument('-v', '--ViewBrowser',required=False, type=int,help='to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile', default=None)
 parser.add_argument('-json', '--json',required=False, type=int,help='to output the data in JSON format', default=None)
 parser.add_argument('-s', '--Selection',required=False, type=int,help='to select what to output , -s 1 for Reviews only, while -s 2 for Questionsthe only', default=None)
 
@@ -38,10 +38,10 @@ try:
 except:
     # here , it means no arguments were entered, so display the Help and exit !!
     print('===================================================================')
-    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 0 -s 2')
+    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1 -s 2')
     print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')
     print('also in this Example, we chose to output Questions Only and ignore Reviews')
-    print('and the Browser will be invisible, as ignoring -v as default will make Browser invisible')
+    print('and the Browser will be visible, as ignoring -v as default will make Browser invisible')
     print('\nand no need to put parameters in order !!')
     print('===================================================================')
     parser.print_help()
@@ -82,13 +82,13 @@ if(check_P_I(args.QuestionsCount)):
 else:
     Question_limit = None
 
-if(args.HideBrowser == None):
-    _to_HideBrowser=True
+if(args.ViewBrowser == None):
+    _to_ViewBrowser=False
 else:
-    if(check_P_I(args.HideBrowser)):
-        _to_HideBrowser = bool(args.HideBrowser)
+    if(check_P_I(args.ViewBrowser)):
+        _to_ViewBrowser = bool(args.ViewBrowser)
     else:
-        _to_HideBrowser = True
+        _to_ViewBrowser = False
 
 
 if(check_P_I(args.json)):
@@ -147,7 +147,7 @@ _ASIN_Validity = _check_ASIN_Existance(full_URL)
 if _ASIN_Validity:
     print('- Valid Product ASIN is being processed')
 
-    driver_ = initialize_WebDriver(_to_HideBrowser)
+    driver_ = initialize_WebDriver(_to_ViewBrowser)
 
     # driver.get(URL_)
     # driver_ = initialize_WebDriver(Chrome_Driver_Path)
@@ -183,7 +183,7 @@ if _ASIN_Validity:
     # 5- Loading the Page of All Reviews of the Product !!!
     #===========================================================================
 
-    if(Output_Selection == 1):
+    if(Output_Selection == 1 or Output_Selection==None):
         Reviews_List = get_All_Product_Reviews(driver_,Amazon_Product_,Reviews_limit)
 
         #===========================================================================
@@ -196,7 +196,7 @@ if _ASIN_Validity:
     #===========================================================================
     # 6- Loading the Page of All Questions about the Product !!!
     #===========================================================================
-    if(Output_Selection == 2):
+    if(Output_Selection == 2 or Output_Selection==None):
         Questions_List = get_All_PrdocutQuestions(driver_,Amazon_Product_,Question_limit)
 
         #==============================================================================

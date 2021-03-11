@@ -36,7 +36,7 @@ I fixed the json format output by adding .dict for each object before appending 
 Amazon_Asin_V1.5.py
 =============================
 
-I could from main page extract all links for Reviews pag , and Question page ( actually it is a fixed URL for questions)
+I could get from main page extract all links for Reviews pages , and Question pages ( actually it is a fixed URL for questions)
 
 then use these links to go for each page and fetch the data for each scope
 
@@ -104,8 +104,9 @@ Added Parameter to hide the Browser or display it while fetching the data, examp
 no need to put parameters in order !!
 
 Example: python Amazon_Asin_V2.0.py -q 2 -r 2 -a B07MW4BR8D -v 1
+
 in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D
-and the Brwoser will be invisible
+and the Brwoser will be visible , as default is to be invisible
 
 usage: Amazon_Asin_V2.0.py [-h] -a ASIN [-r REVIEWSCOUNT] [-q QUESTIONSCOUNT] [-v HIDEBROWSER]
 
@@ -125,9 +126,9 @@ optional arguments:
 
 	Please enter Maximum of Questions Pages to collect , Optional Parameter ,if not set, the tool will collect all Product Questions
 
-  -v HIDEBROWSER, --HideBrowser HIDEBROWSER
+  -v VIEWBROWSER, --VIEWBROWSER VIEWBROWSER
 
-	to Hide the Browser, "0" means to Hide , while "1" means to display it, Optional Parameter ,if not set, the Browser will be invisibile
+	to View the Browser, "1" means to View , while "0" means to hide it, as it is default value, and no need to set it to hide it !!
 
 
 

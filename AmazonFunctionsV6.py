@@ -21,6 +21,11 @@ from random import randint
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 
+# add below library in hiddenimports=[], in Amazon_Asin_V2.1.spec before building
+# building command is pyinstaller -F xx.py __onedir
+import pandas.io.excel._xlsxwriter
+import xlsxwriter
+
 
 #===================================================================
 # Declaring variables
@@ -64,7 +69,7 @@ headers_ = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Ge
 # ==========================================================================================================
 # Initiating Webdriver
 # ==========================================================================================================
-def initialize_WebDriver(_hideBrowser):
+def initialize_WebDriver(_viewBrowser):
 
     print('- Initializing ...')
 
@@ -76,7 +81,7 @@ def initialize_WebDriver(_hideBrowser):
     #How to turn off command line logging in Selenium using Chrome in Python
     options.add_argument("--log-level=3")
     # to hide the browser
-    if(_hideBrowser):
+    if(not _viewBrowser):
         options.add_argument('--headless')
 
     # ChromeDriverManager helps you avoid below error
@@ -806,14 +811,24 @@ def _save_Data_to_XLSX(_to_file,_Amazon_Product_Data,args):
     # Write each dataframe to a different worksheet.
     df1.to_excel(writer, sheet_name='Product_Profile')
 
+    _tmp_index = 0
     if(args.Selection == 1 or args.Selection ==None):
-        Product_Reviews = _Amazon_Product_Data[1]['Amazon Product Reviews']
+        if (args.Selection == 1):
+            _tmp_index = 1
+        elif (args.Selection == None):
+            _tmp_index = 1
+        Product_Reviews = _Amazon_Product_Data[_tmp_index]['Amazon Product Reviews']
         tmp_2 = _dicts_to_list(Product_Reviews)
         df2 = pd.DataFrame(tmp_2)
         df2.to_excel(writer, sheet_name='Product_Reviews', index=False, header=False)
 
+    _tmp_index = 0
     if(args.Selection == 2 or args.Selection ==None):
-        Product_Questions = _Amazon_Product_Data[2]['Amazon Product Questions']
+        if(args.Selection==2):
+            _tmp_index = 1
+        elif(args.Selection==None):
+            _tmp_index = 2
+        Product_Questions = _Amazon_Product_Data[_tmp_index]['Amazon Product Questions']
         tmp_3 = _dicts_to_list(Product_Questions)
         df3 = pd.DataFrame(tmp_3)
         df3.to_excel(writer, sheet_name='Product_Questions', index=False, header=False)
