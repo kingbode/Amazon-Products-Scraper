@@ -1,0 +1,16 @@
+Demo for the tool that gets the following from Amazon website:
+
+1- Product Profile
+2- Product Reviews
+3- Product Questions and answers from clients
+
+all you need is Product ASIN number : B07MW4BR8D
+
+Amazon_Asin_V2.1.exe -a B07MW4BR8D -r 20 -q 20
+
+command line to collect the reviews and questions 20 page for each + product profile
+
+data will be collected in ASINS folder
+
+
+
