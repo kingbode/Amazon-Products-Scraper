@@ -34,7 +34,7 @@ try:
 except:
     # here , it means no arguments were entered, so display the Help and exit !!
     print('===================================================================')
-    print('Example: >python Amazon_Asin_V2.1.py -q 2 -r 2 -a B07MW4BR8D -v 1')
+    print('Example: >python Amazon_Asin_V2.2.py -q 2 -r 2 -a B07MW4BR8D -v 1')
     print('in this Example, we collect two pages of Reveiws and two pages of Questions for the Produc that has ASIN = B07MW4BR8D')
     print('and the Browser will be invisible')
     print('\nand no need to put parameteres in order !!')
