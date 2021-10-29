@@ -1,4 +1,4 @@
-from AmazonFunctionsV6 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
+from AmazonFunctionsV7 import load_Procut_Page, remove_Nagging_Window, get_Product_Profile, \
     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
     check_P_I, _save_Data_to_XLSX
 
@@ -28,7 +28,13 @@ parser.add_argument('-json', '--json',required=False, type=int,help='to output t
 parser.add_argument('-s', '--Selection',required=False, type=int,help='to select what to output , -s 1 for Reviews only, while -s 2 for Questionsthe only', default=None)
 
 
+'''
+B085TFF7M1
+-a B072JXVTKT -r 20 -q 20 -v 1
+-a B085TFF7M1 -r 20 -q 20 -v 1
+-a B085TFF7M1 -v 1
 
+'''
 try:
     args = parser.parse_args()
 
@@ -45,7 +51,7 @@ except:
     print('\nand no need to put parameters in order !!')
     print('===================================================================')
     parser.print_help()
-    parser.exit(1)
+    # parser.exit(1)
 
 
 
@@ -65,33 +71,35 @@ timeout = 5
 # ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
 
 # ASIN_ = input('Please Input Amazon Product ASIN : ')
-ASIN_ = args.ASIN
 
-if(check_P_I(args.ReviewsCount)):
+ASIN_ = args.ASIN
+# ASIN_ = 'B085TFF7M1'
+
+if(args != None and check_P_I(args.ReviewsCount)):
     Reviews_limit = args.ReviewsCount
 else:
     Reviews_limit = None
 
-if(check_P_I(args.Selection)):
+if(args != None and check_P_I(args.Selection)):
     Output_Selection = args.Selection
 else:
     Output_Selection = None
 
-if(check_P_I(args.QuestionsCount)):
+if(args != None and check_P_I(args.QuestionsCount)):
     Question_limit = args.QuestionsCount
 else:
     Question_limit = None
 
-if(args.ViewBrowser == None):
+if(args != None and args.ViewBrowser == None):
     _to_ViewBrowser=False
 else:
-    if(check_P_I(args.ViewBrowser)):
+    if(args != None and check_P_I(args.ViewBrowser)):
         _to_ViewBrowser = bool(args.ViewBrowser)
     else:
-        _to_ViewBrowser = False
+        _to_ViewBrowser = True
 
 
-if(check_P_I(args.json)):
+if(args != None and check_P_I(args.json)):
     _to_JSON = bool(args.json)
 else:
     _to_JSON = None
