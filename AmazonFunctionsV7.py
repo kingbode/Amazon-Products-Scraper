@@ -261,7 +261,8 @@ def get_Product_Profile(driver_,ASIN_):
 # 5- Loading the Page of All Reviews of the Product !!!
 #===========================================================================
 def get_All_Product_Reviews(driver_,Amazon_Product_,_Reviews_limit=None):
-    # to avoid not defining Reviews_limit !!
+    # to avoid not defining Reviews_limit by command line arguments , so it will be by default as None, so we need to change it
+    # to a higher value to be like no limit for it !!
     if _Reviews_limit == None:
         _Reviews_limit = 1000
 
@@ -575,11 +576,15 @@ def get_All_Product_Reviews(driver_,Amazon_Product_,_Reviews_limit=None):
 # 6- Loading the Page of All Questions about the Product !!!
 #===========================================================================
 def get_All_PrdocutQuestions(driver_,Amazon_Product_, _Question_limit = None):
+    # to avoid not defining _Question_limit by command line arguments , so it will be by default as None, so we need to change it
+    # to a higher value to be like no limit for it !!
+    if _Question_limit == None:
+        _Question_limit = 1000
     # ===========================================================================
     # Loading the Page of All Questions about the Product !!!
     # ===========================================================================
-    if _Question_limit == None:
-        _Question_limit = 1000
+
+
 
     Questions_List = []
 
