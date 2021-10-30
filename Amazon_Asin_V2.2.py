@@ -2,7 +2,7 @@ from AmazonFunctionsV7 import load_Procut_Page, remove_Nagging_Window, get_Produ
     get_All_Product_Reviews, get_All_PrdocutQuestions, _save_Data_to_JSON , _check_ASIN_Existance, initialize_WebDriver, \
     check_P_I, _save_Data_to_XLSX
 
-from Amazon_Product import Amazon_Product
+from Amazon_Product import Amazon_Product,Args
 
 import time
 
@@ -51,6 +51,9 @@ except:
     print('\nand no need to put parameters in order !!')
     print('===================================================================')
     parser.print_help()
+    args = Args()
+    args.ViewBrowser = True
+
     # parser.exit(1)
 
 
@@ -67,28 +70,40 @@ except:
 timeout = 5
 
 #  Arguments example : -A B07MW4BR8D -R 10 -Q 10
+# -a B085TFF7M1 -r 20 -q 20 -v 1
 # -A B07MW4BR8D
 # ASIN_ = 'B07W8YTDDR' #'B07MW4BR8D'  #'B082B597Y6' #'B07KNHQ8NZ' # this is a sample ASIN
 
 # ASIN_ = input('Please Input Amazon Product ASIN : ')
 
-ASIN_ = args.ASIN
-# ASIN_ = 'B085TFF7M1'
+ASIN_ = 'B085TFF7M1'
+
+if (args != None and args.ASIN != None):
+    pass
+else:
+    args.ASIN = ASIN_
+
 
 if(args != None and check_P_I(args.ReviewsCount)):
     Reviews_limit = args.ReviewsCount
 else:
-    Reviews_limit = None
+    args.ReviewsCount = None
+    Reviews_limit = args.ReviewsCount
+
 
 if(args != None and check_P_I(args.Selection)):
     Output_Selection = args.Selection
 else:
+    args.Output_Selection = None
     Output_Selection = None
+
 
 if(args != None and check_P_I(args.QuestionsCount)):
     Question_limit = args.QuestionsCount
 else:
-    Question_limit = None
+    args.QuestionsCount = None
+    Question_limit = args.QuestionsCount
+
 
 if(args != None and args.ViewBrowser == None):
     _to_ViewBrowser=False
@@ -96,6 +111,7 @@ else:
     if(args != None and check_P_I(args.ViewBrowser)):
         _to_ViewBrowser = bool(args.ViewBrowser)
     else:
+        args.ViewBrowser = True
         _to_ViewBrowser = True
 
 
@@ -103,7 +119,12 @@ if(args != None and check_P_I(args.json)):
     _to_JSON = bool(args.json)
 else:
     _to_JSON = None
+    args.json = None
 
+if(args != None):
+    pass
+else:
+    args.Selection = None
 
 
 Amazon_URL_ = 'https://www.amazon.com'

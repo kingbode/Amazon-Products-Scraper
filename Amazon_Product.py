@@ -21,6 +21,16 @@ class Amazon_Product(object):
         self.Product_Questions_URL = Product_Questions_URL
 
 
+class Args(object):
+
+    def __init__(self, ASIN=None, ReviewsCount=None, QuestionsCount=None,ViewBrowser=None, json=None,Selection=None):
+        self.ASIN = ASIN
+        self.ReviewsCount = ReviewsCount
+        self.QuestionsCount = QuestionsCount
+        self.ViewBrowser = ViewBrowser
+        self.json = json
+        self.Selection = Selection
+
 
 
 
