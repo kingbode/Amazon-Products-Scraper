@@ -140,4 +140,8 @@ Amazon_Asin_V2.1.py
 
 Added the option to output the data in xlsx format as default and json as optional outcome if specified in the command line as -json 1
 
+Demo Video :
+
+https://youtu.be/pbgajFBFbSU 
+
 =============================
