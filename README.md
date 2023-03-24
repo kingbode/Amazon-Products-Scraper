@@ -93,7 +93,7 @@ Amazon_Asin_V2.0.py
 
 Created class for Amzon FunctionV5 to be called from Amazon_Asin_V2.0.py
 
-Added comman line parameters as below:
+Added command line parameters as below:
 
 Added Parameter to Enter ASIN inthe command line, example -a B07MW4BR8D
 
